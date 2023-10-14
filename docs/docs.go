@@ -25,53 +25,9 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/waypoint": {
-            "get": {
-                "description": "Get a Waypoint already in GCOM based on it's ID",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Waypoints"
-                ],
-                "summary": "Get a Waypoint",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Waypoint ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.Waypoint"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/responses.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/responses.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
         "/waypoint": {
             "post": {
-                "description": "Create a waypoint to place into GCOM",
+                "description": "Create a singular waypoint based on JSON, must have sentinel ID of \"-1\"",
                 "consumes": [
                     "application/json"
                 ],
@@ -79,158 +35,12 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Waypoints"
+                    "Waypoint"
                 ],
-                "summary": "Create a Waypoint",
+                "summary": "Create a waypoint",
                 "parameters": [
                     {
-                        "description": "Waypoint Name",
-                        "name": "name",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "description": "Waypoint Longitude",
-                        "name": "long",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "number"
-                        }
-                    },
-                    {
-                        "description": "Waypoint Latitude",
-                        "name": "lat",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "number"
-                        }
-                    },
-                    {
-                        "description": "Waypoint Altitude",
-                        "name": "alt",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "number"
-                        }
-                    },
-                    {
-                        "description": "Waypoint Radius",
-                        "name": "radius",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "number"
-                        }
-                    },
-                    {
-                        "description": "Waypoint Designation",
-                        "name": "designation",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "description": "Waypoint Remarks",
-                        "name": "remarks",
-                        "in": "body",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.Waypoint"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/responses.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/responses.ErrorResponse"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "description": "Deletes a Waypoint already in GCOM based on it's ID",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Waypoints"
-                ],
-                "summary": "Delete a Waypoint",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Waypoint ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.Waypoint"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/responses.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/responses.ErrorResponse"
-                        }
-                    }
-                }
-            },
-            "patch": {
-                "description": "Edit a Waypoint already in GCOM based on it's ID",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Waypoints"
-                ],
-                "summary": "Edit a Waypoint",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Waypoint ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Waypoint",
+                        "description": "Waypoint Data",
                         "name": "waypoint",
                         "in": "body",
                         "required": true,
@@ -241,43 +51,19 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Success",
                         "schema": {
-                            "$ref": "#/definitions/models.Waypoint"
+                            "$ref": "#/definitions/responses.WaypointResponse"
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/responses.ErrorResponse"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        " data": {
-                                            "type": "string"
-                                        },
-                                        " message": {
-                                            "type": "string"
-                                        },
-                                        "status": {
-                                            "type": "integer"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
+                        "description": "Invalid JSON or Waypoint Data",
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "Internal Error Creating Waypoint",
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
@@ -285,9 +71,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/waypoints": {
+        "/waypoint/{id}": {
             "get": {
-                "description": "Get all Waypoints in GCOM",
+                "description": "Get a singular waypoint based on path param",
                 "consumes": [
                     "application/json"
                 ],
@@ -295,9 +81,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Waypoints"
+                    "Waypoint"
                 ],
-                "summary": "Gets all Waypoints",
+                "summary": "Get a waypoint",
                 "parameters": [
                     {
                         "type": "integer",
@@ -309,19 +95,148 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Success",
                         "schema": {
-                            "$ref": "#/definitions/models.Waypoint"
+                            "$ref": "#/definitions/responses.WaypointResponse"
                         }
                     },
                     "404": {
-                        "description": "Not Found",
+                        "description": "Waypoint Not Found",
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "Internal Error Querying Waypoint",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete a singular waypoint based on path param",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Waypoint"
+                ],
+                "summary": "Delete a waypoint",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Waypoint ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success (returns a blank Waypoint)",
+                        "schema": {
+                            "$ref": "#/definitions/responses.WaypointResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Waypoint Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Error Deleting Waypoint",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "Edit a singular waypoint based on path param and JSON",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Waypoint"
+                ],
+                "summary": "Edit a waypoint",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Waypoint ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "example": "{\"name\": \"Whiskey}",
+                        "description": "JSON fields",
+                        "name": "fields",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/responses.WaypointResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid JSON or Waypoint ID",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Waypoint Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Error Editing Waypoint",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/waypoints": {
+            "get": {
+                "description": "Get all waypoints in the database",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Waypoint"
+                ],
+                "summary": "Get all waypoints",
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/responses.WaypointsResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Error Querying Waypoints",
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
@@ -331,11 +246,8 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "echo.Map": {
-            "type": "object",
-            "additionalProperties": true
-        },
         "models.Designation": {
+            "description": "Describes a special purpose for a Waypoint",
             "type": "string",
             "enum": [
                 "launch",
@@ -351,52 +263,104 @@ const docTemplate = `{
             ]
         },
         "models.Waypoint": {
+            "description": "describes a location in GCOM",
             "type": "object",
             "required": [
                 "alt",
+                "id",
                 "lat",
                 "long",
                 "name"
             ],
             "properties": {
-                "alt": {
-                    "type": "number"
-                },
-                "designation": {
-                    "$ref": "#/definitions/models.Designation"
-                },
                 "id": {
+                    "description": "To create a waypoint, ID of \"-1\" must be passed",
                     "type": "string",
-                    "example": "0"
-                },
-                "lat": {
-                    "type": "number"
-                },
-                "long": {
-                    "type": "number"
+                    "x-order": "1",
+                    "example": "1"
                 },
                 "name": {
-                    "type": "string"
+                    "type": "string",
+                    "x-order": "2",
+                    "example": "Alpha"
+                },
+                "lat": {
+                    "type": "number",
+                    "x-order": "3",
+                    "example": 49.267941
+                },
+                "long": {
+                    "type": "number",
+                    "x-order": "4",
+                    "example": -123.24736
+                },
+                "alt": {
+                    "type": "number",
+                    "x-order": "5",
+                    "example": 100
                 },
                 "radius": {
-                    "type": "number"
+                    "description": "Radius around waypoint where it is considered flown over",
+                    "type": "number",
+                    "x-order": "6",
+                    "example": 10
+                },
+                "designation": {
+                    "description": "Designation of waypoint, none by default",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.Designation"
+                        }
+                    ],
+                    "x-order": "7",
+                    "example": "land"
                 },
                 "remarks": {
-                    "type": "string"
+                    "type": "string",
+                    "x-order": "8",
+                    "example": "Task 1 Landing Zone"
                 }
             }
         },
         "responses.ErrorResponse": {
+            "description": "JSON response for any error",
             "type": "object",
             "properties": {
-                "error_data": {
-                    "$ref": "#/definitions/echo.Map"
-                },
-                "message": {
+                "data": {
                     "type": "string"
                 },
-                "status": {
-                    "type": "integer"
+                "message": {
+                    "type": "string",
+                    "example": "Sample error message"
+                }
+            }
+        },
+        "responses.WaypointResponse": {
+            "description": "Describes a response a single waypoint",
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "Sample success message"
+                },
+                "waypoint": {
+                    "$ref": "#/definitions/models.Waypoint"
+                }
+            }
+        },
+        "responses.WaypointsResponse": {
+            "description": "Describes a response with multiple waypoints",
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "Sample success message"
+                },
+                "waypoints": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Waypoint"
+                    }
                 }
             }
         }
@@ -407,7 +371,7 @@ const docTemplate = `{
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
 	Host:             "localhost:1323",
-	BasePath:         "/api",
+	BasePath:         "",
 	Schemes:          []string{},
 	Title:            "GCOM Backend",
 	Description:      "This is the backend service for UBC UAS",

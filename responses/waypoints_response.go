@@ -4,8 +4,10 @@ import (
 	"gcom-backend/models"
 )
 
+// WaypointsResponse describes a JSON response with multiple Waypoints
+//
+// @Description Describes a response with multiple waypoints
 type WaypointsResponse struct {
-	Status    int               `json:"status"`
-	Message   string            `json:"message"`
+	Message   string            `json:"message" example:"Sample success message"`
 	Waypoints []models.Waypoint `json:"waypoints"`
 }

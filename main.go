@@ -19,11 +19,11 @@ import (
 //	@contact.url	https://ubcuas.com/
 //	@contact.email	info@ubcuas.com
 
-//	@host		localhost:1323
-//	@BasePath	/api
+//	@host	localhost:1323
 
 //	@Accept		json
 //	@Produce	json
+//	@Tags		Waypoints
 
 func main() {
 	db := configs.Connect()
@@ -45,7 +45,7 @@ func main() {
 
 	//Waypoints
 	e.POST("/waypoint", controllers.CreateWaypoint)
-	e.PUT("/waypoint/:waypointId", controllers.EditWaypoint)
+	e.PATCH("/waypoint/:waypointId", controllers.EditWaypoint)
 	e.GET("/waypoint/:waypointId", controllers.GetWaypoint)
 	e.DELETE("/waypoint/:waypointId", controllers.DeleteWaypoint)
 	e.GET("/waypoints", controllers.GetAllWaypoints)
