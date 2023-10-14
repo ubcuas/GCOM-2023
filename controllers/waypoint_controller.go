@@ -72,8 +72,7 @@ func CreateWaypoint(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, responses.WaypointResponse{
 		Message:  "Waypoint Created!",
-		Waypoint: waypoint,
-	})
+		Waypoint: waypoint})
 }
 
 // EditWaypoint edits a waypoint

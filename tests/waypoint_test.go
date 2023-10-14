@@ -13,6 +13,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"strconv"
 	"testing"
 
 	"github.com/labstack/echo/v4"
@@ -71,6 +72,7 @@ func (s *WaypointTestSuite) TearDownTest() {
 // Explanation of difference between assert and require is in this function
 func (s *WaypointTestSuite) TestCreateWaypointA() {
 	var wp = models.Waypoint{
+		ID:          -1,
 		Name:        "Alpha",
 		Longitude:   123.456,
 		Latitude:    123.456,
@@ -128,6 +130,7 @@ func (s *WaypointTestSuite) TestMalformedJSON() {
 // Example of how to add parameters to the URI is in this function
 func (s *WaypointTestSuite) TestEditWaypoint() {
 	var wp = models.Waypoint{
+		ID:          -1,
 		Name:        "Alpha",
 		Longitude:   123.456,
 		Latitude:    123.456,
@@ -138,7 +141,6 @@ func (s *WaypointTestSuite) TestEditWaypoint() {
 	}
 	var editJSON = `{"name": "Whiskey"}`
 	var expectedWp = models.Waypoint{
-		ID:          1,
 		Name:        "Whiskey",
 		Longitude:   123.456,
 		Latitude:    123.456,
@@ -154,15 +156,19 @@ func (s *WaypointTestSuite) TestEditWaypoint() {
 		panic("Error marshalling test waypoint!")
 	}
 
-	createC, _ := JSONContextBuilder(s, http.MethodPost, "/waypoint", wpBytes)
+	createC, createRec := JSONContextBuilder(s, http.MethodPost, "/waypoint", wpBytes)
 
 	require.NoError(s.T(), controllers.CreateWaypoint(createC))
 
+	var createResp responses.WaypointResponse
+	require.NoError(s.T(), json.Unmarshal(createRec.Body.Bytes(), &createResp))
+	expectedWp.ID = createResp.Waypoint.ID
+
 	//In order to add parameters, we must specify them this way
-	c, rec := JSONContextBuilder(s, http.MethodPut, "/waypoint", []byte(editJSON))
+	c, rec := JSONContextBuilder(s, http.MethodPatch, "/waypoint", []byte(editJSON))
 	c.SetPath("/waypoint/:waypointId")
 	c.SetParamNames("waypointId")
-	c.SetParamValues("1")
+	c.SetParamValues(strconv.Itoa(expectedWp.ID))
 	require.NoError(s.T(), controllers.EditWaypoint(c))
 	assert.Equal(s.T(), http.StatusOK, rec.Code)
 
@@ -185,6 +191,7 @@ func (s *WaypointTestSuite) TestEditNonExistentWaypoint() {
 
 func (s *WaypointTestSuite) TestQueryWaypoint() {
 	var wp = models.Waypoint{
+		ID:          -1,
 		Name:        "Alpha",
 		Longitude:   123.456,
 		Latitude:    123.456,
@@ -195,7 +202,6 @@ func (s *WaypointTestSuite) TestQueryWaypoint() {
 	}
 
 	var expectedWp = models.Waypoint{
-		ID:          1,
 		Name:        "Alpha",
 		Longitude:   123.456,
 		Latitude:    123.456,
@@ -210,14 +216,18 @@ func (s *WaypointTestSuite) TestQueryWaypoint() {
 		panic("Error marshalling test waypoints!")
 	}
 
-	createC, _ := JSONContextBuilder(s, http.MethodPost, "/waypoint", wpBytes)
+	createC, createRec := JSONContextBuilder(s, http.MethodPost, "/waypoint", wpBytes)
 
 	require.NoError(s.T(), controllers.CreateWaypoint(createC))
+
+	var createResp responses.WaypointResponse
+	require.NoError(s.T(), json.Unmarshal(createRec.Body.Bytes(), &createResp))
+	expectedWp.ID = createResp.Waypoint.ID
 
 	c, rec := BlankContextBuilder(s, http.MethodGet, "/waypoint")
 	c.SetPath("/waypoint/:waypointId")
 	c.SetParamNames("waypointId")
-	c.SetParamValues("1")
+	c.SetParamValues(strconv.Itoa(expectedWp.ID))
 
 	var response responses.WaypointResponse
 	require.NoError(s.T(), controllers.GetWaypoint(c))
@@ -239,6 +249,7 @@ func (s *WaypointTestSuite) TestQueryNonExistentWaypoint() {
 
 func (s *WaypointTestSuite) TestDeleteWaypoint() {
 	var wp = models.Waypoint{
+		ID:          -1,
 		Name:        "Alpha",
 		Longitude:   123.456,
 		Latitude:    123.456,
@@ -254,14 +265,17 @@ func (s *WaypointTestSuite) TestDeleteWaypoint() {
 		panic("Error marshalling test waypoints!")
 	}
 
-	createC, _ := JSONContextBuilder(s, http.MethodPost, "/waypoint", wpBytes)
+	createC, createRec := JSONContextBuilder(s, http.MethodPost, "/waypoint", wpBytes)
 
 	require.NoError(s.T(), controllers.CreateWaypoint(createC))
+
+	var createResp responses.WaypointResponse
+	require.NoError(s.T(), json.Unmarshal(createRec.Body.Bytes(), &createResp))
 
 	c, rec := BlankContextBuilder(s, http.MethodDelete, "/waypoint")
 	c.SetPath("/waypoint/:waypointId")
 	c.SetParamNames("waypointId")
-	c.SetParamValues("1")
+	c.SetParamValues(strconv.Itoa(createResp.Waypoint.ID))
 
 	require.NoError(s.T(), controllers.GetWaypoint(c))
 	assert.Equal(s.T(), http.StatusOK, rec.Code)
@@ -280,6 +294,7 @@ func (s *WaypointTestSuite) TestDeleteNonExistentWaypoint() {
 func (s *WaypointTestSuite) TestQueryAllWaypoints() {
 	var wps = []models.Waypoint{
 		{
+			ID:          -1,
 			Name:        "Alpha",
 			Longitude:   123.456,
 			Latitude:    123.456,
@@ -289,6 +304,7 @@ func (s *WaypointTestSuite) TestQueryAllWaypoints() {
 			Remarks:     "landing zone",
 		},
 		{
+			ID:          -1,
 			Name:        "Beta",
 			Longitude:   123.456,
 			Latitude:    123.456,
@@ -299,28 +315,7 @@ func (s *WaypointTestSuite) TestQueryAllWaypoints() {
 		},
 	}
 
-	var expectedWps = []models.Waypoint{
-		{
-			ID:          1,
-			Name:        "Alpha",
-			Longitude:   123.456,
-			Latitude:    123.456,
-			Altitude:    100,
-			Radius:      10,
-			Designation: "land",
-			Remarks:     "landing zone",
-		},
-		{
-			ID:          2,
-			Name:        "Beta",
-			Longitude:   123.456,
-			Latitude:    123.456,
-			Altitude:    100,
-			Radius:      10,
-			Designation: "takeoff",
-			Remarks:     "takeoff zone",
-		},
-	}
+	var expectedWps []models.Waypoint
 
 	for _, wp := range wps {
 		var wpBytes, marshalErr = json.Marshal(&wp)
@@ -331,7 +326,12 @@ func (s *WaypointTestSuite) TestQueryAllWaypoints() {
 
 		createC, createRec := JSONContextBuilder(s, http.MethodPost, "/waypoint", wpBytes)
 		require.NoError(s.T(), controllers.CreateWaypoint(createC))
+
+		var createResp responses.WaypointResponse
+		require.NoError(s.T(), json.Unmarshal(createRec.Body.Bytes(), &createResp))
+
 		assert.Equal(s.T(), http.StatusOK, createRec.Code)
+		expectedWps = append(expectedWps, createResp.Waypoint)
 	}
 
 	c, rec := BlankContextBuilder(s, http.MethodGet, "/waypoints")
