@@ -18,12 +18,7 @@ We highly recommend testing endpoints using the Insomnia Client and will be shar
 - [GORM (ORM database handler)](https://gorm.io/docs/)
 
 ## Authorization
-All requests to the backend service require and authorization header. The token can be set in the .env file (remember to
-add this to your .gitignore). To add the token to the request, and say the token is "123ABC" you should put this in the fields for the header:
-
-    header: Authorization
-
-    value: Bearer 123ABC
+TBD
 
 ## File Structure
 
