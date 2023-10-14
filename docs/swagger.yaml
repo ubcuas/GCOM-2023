@@ -1,0 +1,264 @@
+basePath: /api
+consumes:
+- application/json
+definitions:
+  echo.Map:
+    additionalProperties: true
+    type: object
+  models.Designation:
+    enum:
+    - launch
+    - land
+    - obstacle
+    - payload
+    type: string
+    x-enum-varnames:
+    - Launch
+    - Land
+    - Obstacle
+    - Payload
+  models.Waypoint:
+    properties:
+      alt:
+        type: number
+      designation:
+        $ref: '#/definitions/models.Designation'
+      id:
+        example: "0"
+        type: string
+      lat:
+        type: number
+      long:
+        type: number
+      name:
+        type: string
+      radius:
+        type: number
+      remarks:
+        type: string
+    required:
+    - alt
+    - lat
+    - long
+    - name
+    type: object
+  responses.ErrorResponse:
+    properties:
+      error_data:
+        $ref: '#/definitions/echo.Map'
+      message:
+        type: string
+      status:
+        type: integer
+    type: object
+host: localhost:1323
+info:
+  contact:
+    email: info@ubcuas.com
+    name: UBC UAS
+    url: https://ubcuas.com/
+  description: This is the backend service for UBC UAS
+  title: GCOM Backend
+  version: "1.0"
+paths:
+  /api/waypoint:
+    get:
+      consumes:
+      - application/json
+      description: Get a Waypoint already in GCOM based on it's ID
+      parameters:
+      - description: Waypoint ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Waypoint'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      summary: Get a Waypoint
+      tags:
+      - Waypoints
+  /waypoint:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a Waypoint already in GCOM based on it's ID
+      parameters:
+      - description: Waypoint ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Waypoint'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      summary: Delete a Waypoint
+      tags:
+      - Waypoints
+    patch:
+      consumes:
+      - application/json
+      description: Edit a Waypoint already in GCOM based on it's ID
+      parameters:
+      - description: Waypoint ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Waypoint
+        in: body
+        name: waypoint
+        required: true
+        schema:
+          $ref: '#/definitions/models.Waypoint'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Waypoint'
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/responses.ErrorResponse'
+            - properties:
+                ' data':
+                  type: string
+                ' message':
+                  type: string
+                status:
+                  type: integer
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      summary: Edit a Waypoint
+      tags:
+      - Waypoints
+    post:
+      consumes:
+      - application/json
+      description: Create a waypoint to place into GCOM
+      parameters:
+      - description: Waypoint Name
+        in: body
+        name: name
+        required: true
+        schema:
+          type: string
+      - description: Waypoint Longitude
+        in: body
+        name: long
+        required: true
+        schema:
+          type: number
+      - description: Waypoint Latitude
+        in: body
+        name: lat
+        required: true
+        schema:
+          type: number
+      - description: Waypoint Altitude
+        in: body
+        name: alt
+        required: true
+        schema:
+          type: number
+      - description: Waypoint Radius
+        in: body
+        name: radius
+        required: true
+        schema:
+          type: number
+      - description: Waypoint Designation
+        in: body
+        name: designation
+        required: true
+        schema:
+          type: string
+      - description: Waypoint Remarks
+        in: body
+        name: remarks
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Waypoint'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      summary: Create a Waypoint
+      tags:
+      - Waypoints
+  /waypoints:
+    get:
+      consumes:
+      - application/json
+      description: Get all Waypoints in GCOM
+      parameters:
+      - description: Waypoint ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Waypoint'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      summary: Gets all Waypoints
+      tags:
+      - Waypoints
+produces:
+- application/json
+swagger: "2.0"

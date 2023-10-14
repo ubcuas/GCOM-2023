@@ -1,0 +1,6 @@
+.env
+database.db
+
+#Editor Files
+.vscode/
+.idea/
