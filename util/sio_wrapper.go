@@ -2,7 +2,6 @@ package util
 
 import (
 	"errors"
-	engineio "github.com/googollee/go-engine.io"
 	socketio "github.com/googollee/go-socket.io"
 	"github.com/labstack/echo/v4"
 )
@@ -31,6 +30,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+// Socket.io wrapper interface
 type IWrapper interface {
 	OnConnect(nsp string, f func(echo.Context, socketio.Conn) error)
 	OnDisconnect(nsp string, f func(echo.Context, socketio.Conn, string))
@@ -44,16 +44,15 @@ type Wrapper struct {
 	Server  *socketio.Server
 }
 
-// NewWrapper Create wrapper and Socket.io server
-func NewWrapper(options engineio.Options) (*Wrapper, error) {
-	server := socketio.NewServer(options)
-
+// Create wrapper and Socket.io server
+func NewWrapper() (*Wrapper, error) {
+	server := socketio.NewServer(nil)
 	return &Wrapper{
 		Server: server,
 	}, nil
 }
 
-// NewWrapperWithServer Create wrapper with exists Socket.io server
+// Create wrapper with exists Socket.io server
 func NewWrapperWithServer(server *socketio.Server) (*Wrapper, error) {
 	if server == nil {
 		return nil, errors.New("socket.io server can not be nil")
@@ -64,35 +63,35 @@ func NewWrapperWithServer(server *socketio.Server) (*Wrapper, error) {
 	}, nil
 }
 
-// OnConnect On Socket.io client connect
+// On Socket.io client connect
 func (s *Wrapper) OnConnect(nsp string, f func(echo.Context, socketio.Conn) error) {
 	s.Server.OnConnect(nsp, func(conn socketio.Conn) error {
 		return f(s.Context, conn)
 	})
 }
 
-// OnDisconnect On Socket.io client disconnect
+// On Socket.io client disconnect
 func (s *Wrapper) OnDisconnect(nsp string, f func(echo.Context, socketio.Conn, string)) {
 	s.Server.OnDisconnect(nsp, func(conn socketio.Conn, msg string) {
 		f(s.Context, conn, msg)
 	})
 }
 
-// OnError On Socket.io error
+// On Socket.io error
 func (s *Wrapper) OnError(nsp string, f func(echo.Context, error)) {
-	s.Server.OnError(nsp, func(err error) {
+	s.Server.OnError(nsp, func(conn socketio.Conn, err error) {
 		f(s.Context, err)
 	})
 }
 
-// OnEvent On Socket.io event from client
+// On Socket.io event from client
 func (s *Wrapper) OnEvent(nsp, event string, f func(echo.Context, socketio.Conn, string)) {
 	s.Server.OnEvent(nsp, event, func(conn socketio.Conn, msg string) {
 		f(s.Context, conn, msg)
 	})
 }
 
-// HandlerFunc Handler function
+// Handler function
 func (s *Wrapper) HandlerFunc(context echo.Context) error {
 	go s.Server.Serve()
 

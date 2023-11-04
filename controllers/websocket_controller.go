@@ -2,23 +2,38 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 	"gcom-backend/models"
+	esi "gcom-backend/util"
 	socketio "github.com/googollee/go-socket.io"
 	"github.com/labstack/echo/v4"
-	esi "github.com/umirode/echo-socket.io"
 	"gorm.io/gorm"
 	"time"
 )
 
-func WebsocketHandler(c echo.Context) error {
-	wrapper, err := esi.NewWrapper(nil)
+func WebsocketHandler() func(context echo.Context) error {
+	wrapper, err := esi.NewWrapper()
 	if err != nil {
-		c.Logger().Error(err.Error())
+		fmt.Println(err.Error())
+		return nil
 	}
 
-	wrapper.OnEvent("/drone", "info", DroneHandler)
+	wrapper.OnConnect("", func(context echo.Context, conn socketio.Conn) error {
+		conn.SetContext("")
+		context.Logger().Infof("SocketIO: Client Connected (ID: ", conn.ID(), ")")
+		return nil
+	})
+	wrapper.OnError("", func(context echo.Context, e error) {
+		context.Logger().Infof("SocketIO: ", e)
+	})
 
-	return wrapper.HandlerFunc(c)
+	wrapper.OnDisconnect("", func(context echo.Context, conn socketio.Conn, msg string) {
+		context.Logger().Infof("SocketIO: Client Disconnected ( ", msg, ")")
+	})
+
+	wrapper.OnEvent("/drone", "update", DroneHandler)
+
+	return wrapper.HandlerFunc
 }
 
 func DroneHandler(c echo.Context, conn socketio.Conn, msg string) {
