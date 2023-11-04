@@ -51,7 +51,7 @@ func main() {
 	e.GET("/status/history", controllers.GetStatusHistory)
 
 	//Websockets
-	e.GET("/ws/drone", controllers.DroneWebsocket)
+	e.Any("/ws", controllers.WebsocketHandler)
 
 	e.Logger.Fatal(e.Start(":1323"))
 }
