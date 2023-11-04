@@ -12,5 +12,5 @@ type Drone struct {
 	Speed         float64 `json:"speed" validate:"required" example:"0.98" extensions:"x-order=6"`
 	Heading       float64 `json:"heading" validate:"required" example:"298.12" extensions:"x-order=7"`
 	//Payloads TBD
-	BatteryVoltage float64 `json:"voltage" validate:"required" example:"2.6" extensions:"x-order=9"`
+	BatteryVoltage float64 `json:"battery_voltage" validate:"required" example:"2.6" extensions:"x-order=9"`
 }
