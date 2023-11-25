@@ -75,6 +75,67 @@ func CreateWaypoint(c echo.Context) error {
 		Waypoint: waypoint})
 }
 
+// CreateWaypointBatch creates multiple waypoints
+//
+//	@Summary		Create multiple waypoint
+//	@Description	Create multiple waypoints based on JSON, must have sentinel ID of "-1"
+//	@Tags			Waypoint
+//	@Accept			json
+//	@Produce		json
+//	@Param			waypoint	body		models.Waypoint				true	"Waypoint Data"
+//	@Success		200			{object}	responses.WaypointResponse	"Success"
+//	@Failure		400			{object}	responses.ErrorResponse		"Invalid JSON or Waypoint Data"
+//	@Failure		500			{object}	responses.ErrorResponse		"Internal Error Creating Waypoint"
+//	@Router			/waypoint [post]
+func CreateWaypointBatch(c echo.Context) error {
+	var waypoints []models.Waypoint //Declares an empty Waypoint class
+	db, _ := c.Get("db").(*gorm.DB) //Obtains the DB instance from the context
+
+	if err := c.Bind(&waypoints); err != nil {
+		/*
+			.Bind() basically tries to force the JSON data provided into the
+			struct, using the json:"field" annotations we added to know what
+			goes where. c.Bind directly edits the waypoint variable and as such
+			we provide the memory address of it using the & symbol in front.
+			c.Bind returns an error if something goes wrong, and we catch it here
+			by checking if it is nil
+		*/
+		return c.JSON(http.StatusBadRequest, responses.ErrorResponse{
+			Message: "Invalid JSON format",
+			Data:    err.Error()})
+	}
+
+	if validationErr := validate.Struct(&waypoints); validationErr != nil {
+		/*
+			validate.Struct() validates the struct based on the validate
+			annotation we provided in the struct definition
+		*/
+		return c.JSON(http.StatusBadRequest, responses.ErrorResponse{
+			Message: "Invalid waypoint data",
+			Data:    validationErr.Error()})
+	}
+
+	if waypoints.ID != -1 {
+		return c.JSON(http.StatusBadRequest, responses.ErrorResponse{
+			Message: "Non-sentinel ID passed"})
+	} else {
+		waypoints.ID = 0
+	}
+
+	if createErr := db.Create(&waypoints).Error; createErr != nil {
+		/*
+			Here we use GROM functions. GROM has already created tables for the
+			model definitions we provided and knows what type `waypoint` is
+		*/
+		return c.JSON(http.StatusInternalServerError, responses.ErrorResponse{
+			Message: "An error occurred creating the waypoint"})
+	}
+
+	return c.JSON(http.StatusOK, responses.WaypointResponse{
+		Message:  "Waypoint Created!",
+		Waypoint: waypoints})
+}
+
 // EditWaypoint edits a waypoint
 //
 //	@Summary		Edit a waypoint
