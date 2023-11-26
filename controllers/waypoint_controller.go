@@ -98,13 +98,12 @@ func CreateWaypointBatch(c echo.Context) error {
 			Data:    err.Error()})
 	}
 
-	if validationErr := validate.Struct(&waypoints); validationErr != nil {
-		return c.JSON(http.StatusBadRequest, responses.ErrorResponse{
-			Message: "Invalid waypoints data",
-			Data:    validationErr.Error()})
-	}
-
 	for i := 0; i < len(waypoints); i++ {
+		if validationErr := validate.Struct(&(waypoints[i])); validationErr != nil {
+			return c.JSON(http.StatusBadRequest, responses.ErrorResponse{
+				Message: "Invalid waypoints data",
+				Data:    validationErr.Error()})
+		}
 		if waypoints[i].ID != -1 {
 			return c.JSON(http.StatusBadRequest, responses.ErrorResponse{
 				Message: fmt.Sprintf("Non-sentinel ID passed for waypoint %d", i)})
