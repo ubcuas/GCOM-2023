@@ -80,11 +80,11 @@ func CreateWaypoint(c echo.Context) error {
 //
 //	@Summary		Create multiple waypoints
 //	@Description	Create multiple waypoints based on JSON, all must have sentinel ID of "-1"
-//	@Tags			[]Waypoint
+//	@Tags			Waypoint
 //	@Accept			json
 //	@Produce		json
-//	@Param			waypoints	body		[]models.Waypoint			true	"Waypoints Data"
-//	@Success		200			{object}	responses.WaypointResponse	"Success"
+//	@Param			waypoints	body		[]models.Waypoint			true		"Array of Waypoint Data"
+//	@Success		200			{object}	responses.WaypointsResponse	"Success"
 //	@Failure		400			{object}	responses.ErrorResponse		"Invalid JSON or Waypoint Data"
 //	@Failure		500			{object}	responses.ErrorResponse		"Internal Error Creating Waypoint"
 //	@Router			/waypoints [post]

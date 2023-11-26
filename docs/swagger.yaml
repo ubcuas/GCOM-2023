@@ -14,6 +14,52 @@ definitions:
     - Land
     - Obstacle
     - Payload
+  models.Drone:
+    description: describes the drone being flown
+    properties:
+      alt:
+        example: 100
+        type: number
+        x-order: "4"
+      battery_voltage:
+        description: Payloads TBD
+        example: 2.6
+        type: number
+        x-order: "9"
+      heading:
+        example: 298.12
+        type: number
+        x-order: "7"
+      lat:
+        example: 49.267941
+        type: number
+        x-order: "2"
+      long:
+        example: -123.24736
+        type: number
+        x-order: "3"
+      speed:
+        example: 0.98
+        type: number
+        x-order: "6"
+      timestamp:
+        example: 1698544781
+        type: integer
+        x-order: "1"
+      v_speed:
+        example: -1.63
+        type: number
+        x-order: "5"
+    required:
+    - alt
+    - battery_voltage
+    - heading
+    - lat
+    - long
+    - speed
+    - timestamp
+    - v_speed
+    type: object
   models.Waypoint:
     description: describes a location in GCOM
     properties:
@@ -99,6 +145,34 @@ info:
   title: GCOM Backend
   version: "1.0"
 paths:
+  /status:
+    get:
+      description: Get the current status of the drone
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/models.Drone'
+      summary: Get drone status
+      tags:
+      - Drone
+  /status/history:
+    get:
+      description: Get drone status for the last 5 minutes
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            items:
+              $ref: '#/definitions/models.Drone'
+            type: array
+      summary: Get drone status history
+      tags:
+      - Drone
   /waypoint:
     post:
       consumes:
@@ -106,7 +180,7 @@ paths:
       description: Create a singular waypoint based on JSON, must have sentinel ID
         of "-1"
       parameters:
-      - description: Waypoint Data
+      - description: Waypoint data.
         in: body
         name: waypoint
         required: true
@@ -243,6 +317,38 @@ paths:
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
       summary: Get all waypoints
+      tags:
+      - Waypoint
+    post:
+      consumes:
+      - application/json
+      description: Create multiple waypoints based on JSON, all must have sentinel
+        ID of "-1"
+      parameters:
+      - description: Array of Waypoint Data
+        in: body
+        name: waypoints
+        required: true
+        schema:
+          items:
+            $ref: '#/definitions/models.Waypoint'
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/responses.WaypointsResponse'
+        "400":
+          description: Invalid JSON or Waypoint Data
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "500":
+          description: Internal Error Creating Waypoint
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      summary: Create multiple waypoints
       tags:
       - Waypoint
 produces:

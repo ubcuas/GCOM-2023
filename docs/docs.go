@@ -25,6 +25,49 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/status": {
+            "get": {
+                "description": "Get the current status of the drone",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Drone"
+                ],
+                "summary": "Get drone status",
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/models.Drone"
+                        }
+                    }
+                }
+            }
+        },
+        "/status/history": {
+            "get": {
+                "description": "Get drone status for the last 5 minutes",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Drone"
+                ],
+                "summary": "Get drone status history",
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Drone"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/waypoint": {
             "post": {
                 "description": "Create a singular waypoint based on JSON, must have sentinel ID of \"-1\"",
@@ -40,7 +83,7 @@ const docTemplate = `{
                 "summary": "Create a waypoint",
                 "parameters": [
                     {
-                        "description": "Waypoint Data",
+                        "description": "Waypoint data.",
                         "name": "waypoint",
                         "in": "body",
                         "required": true,
@@ -242,6 +285,53 @@ const docTemplate = `{
                         }
                     }
                 }
+            },
+            "post": {
+                "description": "Create multiple waypoints based on JSON, all must have sentinel ID of \"-1\"",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Waypoint"
+                ],
+                "summary": "Create multiple waypoints",
+                "parameters": [
+                    {
+                        "description": "Array of Waypoint Data",
+                        "name": "waypoints",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Waypoint"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/responses.WaypointsResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid JSON or Waypoint Data",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Error Creating Waypoint",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    }
+                }
             }
         }
     },
@@ -261,6 +351,63 @@ const docTemplate = `{
                 "Obstacle",
                 "Payload"
             ]
+        },
+        "models.Drone": {
+            "description": "describes the drone being flown",
+            "type": "object",
+            "required": [
+                "alt",
+                "battery_voltage",
+                "heading",
+                "lat",
+                "long",
+                "speed",
+                "timestamp",
+                "v_speed"
+            ],
+            "properties": {
+                "timestamp": {
+                    "type": "integer",
+                    "x-order": "1",
+                    "example": 1698544781
+                },
+                "lat": {
+                    "type": "number",
+                    "x-order": "2",
+                    "example": 49.267941
+                },
+                "long": {
+                    "type": "number",
+                    "x-order": "3",
+                    "example": -123.24736
+                },
+                "alt": {
+                    "type": "number",
+                    "x-order": "4",
+                    "example": 100
+                },
+                "v_speed": {
+                    "type": "number",
+                    "x-order": "5",
+                    "example": -1.63
+                },
+                "speed": {
+                    "type": "number",
+                    "x-order": "6",
+                    "example": 0.98
+                },
+                "heading": {
+                    "type": "number",
+                    "x-order": "7",
+                    "example": 298.12
+                },
+                "battery_voltage": {
+                    "description": "Payloads TBD",
+                    "type": "number",
+                    "x-order": "9",
+                    "example": 2.6
+                }
+            }
         },
         "models.Waypoint": {
             "description": "describes a location in GCOM",
