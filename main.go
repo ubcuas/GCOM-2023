@@ -5,9 +5,12 @@ import (
 	"gcom-backend/controllers"
 	_ "gcom-backend/docs"
 	"gcom-backend/util"
+	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	echoSwagger "github.com/swaggo/echo-swagger"
+	"log"
+	"os"
 )
 
 //	@title			GCOM Backend
@@ -25,11 +28,21 @@ import (
 //	@Tags		Waypoints
 
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
 	db := configs.Connect()
+	mp, err := util.NewMissionPlanner(os.Getenv("mp_url"))
+	if err != nil {
+		log.Fatal("Error connecting to Mission Planner")
+	}
 
 	e := echo.New()
 
 	e.Use(util.DBMiddleware(db))
+	e.Use(util.MPMiddleware(mp))
 	e.Use(middleware.Logger())
 
 	e.GET("/", func(c echo.Context) error {
