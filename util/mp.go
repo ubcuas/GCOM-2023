@@ -46,6 +46,7 @@ type MissionPlanner struct {
 
 // NewMissionPlanner creates a new instance of MissionPlanner - this should only be in main.go
 func NewMissionPlanner(url string) (*MissionPlanner, error) {
+	//Assumes method of checking if MP is alive
 	res, err := http.Get(url)
 	if err != nil && res.StatusCode == 200 {
 		return &MissionPlanner{
