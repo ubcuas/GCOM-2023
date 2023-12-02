@@ -5,6 +5,7 @@ import (
 	"gcom-backend/controllers"
 	_ "gcom-backend/docs"
 	"gcom-backend/util"
+
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	echoSwagger "github.com/swaggo/echo-swagger"
@@ -41,9 +42,11 @@ func main() {
 
 	//Waypoints
 	e.POST("/waypoint", controllers.CreateWaypoint)
+	e.POST("/waypoints", controllers.CreateWaypointBatch)
 	e.PATCH("/waypoint/:waypointId", controllers.EditWaypoint)
 	e.GET("/waypoint/:waypointId", controllers.GetWaypoint)
 	e.DELETE("/waypoint/:waypointId", controllers.DeleteWaypoint)
+	e.DELETE("/waypoints", controllers.DeleteWaypointBatch)
 	e.GET("/waypoints", controllers.GetAllWaypoints)
 
 	//Drone
@@ -53,5 +56,5 @@ func main() {
 	//Websockets
 	e.Any("/socket.io/", controllers.WebsocketHandler())
 
-	e.Logger.Fatal(e.Start(":1323"))
+	e.Logger.Fatal(e.Start("localhost:1323"))
 }
