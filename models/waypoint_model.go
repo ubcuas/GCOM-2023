@@ -28,3 +28,15 @@ type Waypoint struct {
 	Designation Designation `json:"designation,omitempty" example:"land" extensions:"x-order=7"`
 	Remarks     string      `json:"remarks,omitempty" example:"Task 1 Landing Zone" extensions:"x-order=8"`
 }
+
+type WaypointIDs struct {
+	/*
+		IDs is an array of strings because idk how to implement
+		custom unmarshalling of the json strings into ints.
+		I have chosen to simply convert the strings to integers
+		in the route function in waypoint_controller.go (see DeleteWaypointBatch())s
+		Please lmk if there is a way to do this in the unmarshalling process
+		instead of the actual route.
+	*/
+	IDs []string `json:"ids" example:"1,2,3"`
+}

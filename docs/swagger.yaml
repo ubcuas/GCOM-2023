@@ -106,6 +106,22 @@ definitions:
     - long
     - name
     type: object
+  models.WaypointIDs:
+    properties:
+      ids:
+        description: "IDs is an array of strings because idk how to implement\n\t\tcustom
+          unmarshalling of the json strings into ints.\n\t\tI have chosen to simply
+          convert the strings to integers\n\t\tin the route function in waypoint_controller.go
+          (see DeleteWaypointBatch())s\n\t\tPlease lmk if there is a way to do this
+          in the unmarshalling process\n\t\tinstead of the actual route."
+        example:
+        - "1"
+        - "2"
+        - "3"
+        items:
+          type: string
+        type: array
+    type: object
   responses.ErrorResponse:
     description: JSON response for any error
     properties:
@@ -180,7 +196,7 @@ paths:
       description: Create a singular waypoint based on JSON, must have sentinel ID
         of "-1"
       parameters:
-      - description: Waypoint data.
+      - description: Waypoint Data
         in: body
         name: waypoint
         required: true
@@ -301,6 +317,39 @@ paths:
       tags:
       - Waypoint
   /waypoints:
+    delete:
+      consumes:
+      - application/json
+      description: Delete multiple waypoints based on json body
+      parameters:
+      - description: Waypoint IDs
+        in: body
+        name: id
+        required: true
+        schema:
+          $ref: '#/definitions/models.WaypointIDs'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success (returns a blank Waypoint)
+          schema:
+            $ref: '#/definitions/responses.WaypointResponse'
+        "400":
+          description: Invalid JSON or Waypoint IDs
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "404":
+          description: Waypoints Not Found
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "500":
+          description: Internal Error Deleting Waypoint
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      summary: Delete multiple waypoints
+      tags:
+      - Waypoint
     get:
       consumes:
       - application/json

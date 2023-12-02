@@ -46,6 +46,7 @@ func main() {
 	e.PATCH("/waypoint/:waypointId", controllers.EditWaypoint)
 	e.GET("/waypoint/:waypointId", controllers.GetWaypoint)
 	e.DELETE("/waypoint/:waypointId", controllers.DeleteWaypoint)
+	e.DELETE("/waypoints", controllers.DeleteWaypointBatch)
 	e.GET("/waypoints", controllers.GetAllWaypoints)
 
 	//Drone

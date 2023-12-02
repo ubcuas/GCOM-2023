@@ -83,7 +83,7 @@ const docTemplate = `{
                 "summary": "Create a waypoint",
                 "parameters": [
                     {
-                        "description": "Waypoint data.",
+                        "description": "Waypoint Data",
                         "name": "waypoint",
                         "in": "body",
                         "required": true,
@@ -332,6 +332,56 @@ const docTemplate = `{
                         }
                     }
                 }
+            },
+            "delete": {
+                "description": "Delete multiple waypoints based on json body",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Waypoint"
+                ],
+                "summary": "Delete multiple waypoints",
+                "parameters": [
+                    {
+                        "description": "Waypoint IDs",
+                        "name": "id",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.WaypointIDs"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success (returns a blank Waypoint)",
+                        "schema": {
+                            "$ref": "#/definitions/responses.WaypointResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid JSON or Waypoint IDs",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Waypoints Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Error Deleting Waypoint",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    }
+                }
             }
         }
     },
@@ -466,6 +516,23 @@ const docTemplate = `{
                     "type": "string",
                     "x-order": "8",
                     "example": "Task 1 Landing Zone"
+                }
+            }
+        },
+        "models.WaypointIDs": {
+            "type": "object",
+            "properties": {
+                "ids": {
+                    "description": "IDs is an array of strings because idk how to implement\n\t\tcustom unmarshalling of the json strings into ints.\n\t\tI have chosen to simply convert the strings to integers\n\t\tin the route function in waypoint_controller.go (see DeleteWaypointBatch())s\n\t\tPlease lmk if there is a way to do this in the unmarshalling process\n\t\tinstead of the actual route.",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "1",
+                        "2",
+                        "3"
+                    ]
                 }
             }
         },
