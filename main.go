@@ -49,6 +49,9 @@ func main() {
 	//Ground Object
 	e.POST("/ground_object", controllers.CreateGroundObject)
 
+	//Payload
+	e.POST("/payload", controllers.CreatePayload)
+
 	//Drone
 	e.GET("/status", controllers.GetCurrentStatus)
 	e.GET("/status/history", controllers.GetStatusHistory)
