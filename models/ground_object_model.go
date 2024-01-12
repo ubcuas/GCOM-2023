@@ -1,6 +1,6 @@
 package models
 
-type GroundObj struct {
+type GroundObject struct {
 	//To create a ground object, ID of "-1" must be passed
 	ID           int     `json:"id,string" validate:"required" gorm:"primaryKey" example:"-1" extensions:"x-order=1"`
 	Object_Type  string  `json:"obj_type" validate:"required" example:"standard" extensions:"x-order=2"`
