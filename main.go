@@ -46,6 +46,9 @@ func main() {
 	e.DELETE("/waypoint/:waypointId", controllers.DeleteWaypoint)
 	e.GET("/waypoints", controllers.GetAllWaypoints)
 
+	//Ground Object
+	e.POST("/ground_object", controllers.CreateGroundObject)
+
 	//Drone
 	e.GET("/status", controllers.GetCurrentStatus)
 	e.GET("/status/history", controllers.GetStatusHistory)
