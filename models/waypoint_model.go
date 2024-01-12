@@ -9,7 +9,7 @@ const (
 	Launch   Designation = "launch"
 	Land     Designation = "land"
 	Obstacle Designation = "obstacle"
-	Payload  Designation = "payload"
+	// Payload  Designation = "payload"
 )
 
 // Waypoint describes a location
