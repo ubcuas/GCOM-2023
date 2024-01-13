@@ -10,7 +10,6 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 	echoSwagger "github.com/swaggo/echo-swagger"
 	"log"
-	"os"
 )
 
 //	@title			GCOM Backend
@@ -34,15 +33,10 @@ func main() {
 	}
 
 	db := configs.Connect()
-	mp, err := util.NewMissionPlanner(os.Getenv("mp_url"))
-	if err != nil {
-		log.Fatal("Error connecting to Mission Planner")
-	}
 
 	e := echo.New()
 
 	e.Use(util.DBMiddleware(db))
-	e.Use(util.MPMiddleware(mp))
 	e.Use(middleware.Logger())
 
 	e.GET("/", func(c echo.Context) error {
