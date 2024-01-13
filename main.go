@@ -5,11 +5,13 @@ import (
 	"gcom-backend/controllers"
 	_ "gcom-backend/docs"
 	"gcom-backend/util"
+	"log"
+	"os"
+
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	echoSwagger "github.com/swaggo/echo-swagger"
-	"log"
 )
 
 //	@title			GCOM Backend
@@ -32,11 +34,17 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 
-	db := configs.Connect()
+	db := configs.ConnectDatabase()
+
+	mp, err := configs.ConnectMissionPlanner(os.Getenv("MP_URL"))
+	if err != nil {
+		log.Fatal("Error connecting to MPS")
+	}
 
 	e := echo.New()
 
 	e.Use(util.DBMiddleware(db))
+	e.Use(util.MPMiddleware(mp))
 	e.Use(middleware.Logger())
 
 	e.GET("/", func(c echo.Context) error {

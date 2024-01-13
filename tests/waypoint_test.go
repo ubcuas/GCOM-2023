@@ -40,7 +40,7 @@ func TestRunWaypointSuite(t *testing.T) {
 
 // This function is run when the suite is started
 func (s *WaypointTestSuite) SetupSuite() {
-	db := configs.Connect()
+	db := configs.ConnectDatabase()
 	e := echo.New()
 
 	s.e = e

@@ -7,7 +7,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func Connect() *gorm.DB {
+func ConnectDatabase() *gorm.DB {
 	database, err := gorm.Open(sqlite.Open("./database.db"), &gorm.Config{})
 
 	if err != nil {

@@ -1,4 +1,4 @@
-package util
+package configs
 
 import (
 	"errors"
@@ -12,24 +12,24 @@ import (
 	"os"
 )
 
-type MissionPlannerWrapper interface {
-	GetQueue()
-	PostQueue(waypoints []models.Waypoint)
-	GetStatus()
-	Lock()
-	Unlock()
-	Takeoff(altitude float64)
-	Land()
-	ReturnHome()
-	SetHome(waypoint models.Waypoint)
-}
+// type MissionPlannerWrapper interface {
+// 	GetQueue()
+// 	PostQueue(waypoints []models.Waypoint)
+// 	GetStatus()
+// 	Lock()
+// 	Unlock()
+// 	Takeoff(altitude float64)
+// 	Land()
+// 	ReturnHome()
+// 	SetHome(waypoint models.Waypoint)
+// }
 
 type MissionPlanner struct {
 	url string
 }
 
-// NewMissionPlanner creates a new instance of MissionPlanner - this should only be in main.go
-func NewMissionPlanner(url string) (*MissionPlanner, error) {
+// ConnectMissionPlanner creates a new instance of MissionPlanner - this should only be in main.go
+func ConnectMissionPlanner(url string) (*MissionPlanner, error) {
 	//Assumes method of checking if MP is alive
 	res, err := http.Get(url)
 	if err != nil && res.StatusCode == 200 {
@@ -68,8 +68,8 @@ func genericPost(url string, json []byte) *http.Response {
 	return resp
 }
 
-func GetQueue() []models.Waypoint {
-	resp := genericGet(os.Getenv("MP_URL") + "/queue")
+func (mp MissionPlanner) GetQueue() []models.Waypoint {
+	resp := genericGet(mp.url + "/queue")
 	var respArr []mpWaypoint
 	defer resp.Body.Close()
 	body, err := io.ReadAll(resp.Body)
@@ -98,31 +98,31 @@ func GetQueue() []models.Waypoint {
 	return ans
 }
 
-func GetStatus() *http.Response {
-	return genericGet(os.Getenv("MP_URL") + "/status")
+func (mp MissionPlanner) GetStatus() *http.Response {
+	return genericGet(mp.url + "/status")
 }
 
-func ReturnHome() bool {
-	resp := genericGet(os.Getenv("MP_URL") + "/rtl")
+func (mp MissionPlanner) ReturnHome() bool {
+	resp := genericGet(mp.url + "/rtl")
 	return resp.StatusCode == http.StatusOK
 }
 
-func Land() bool {
-	resp := genericGet(os.Getenv("MP_URL") + "/land")
+func (mp MissionPlanner) Land() bool {
+	resp := genericGet(mp.url + "/land")
 	return resp.StatusCode == http.StatusOK
 }
 
-func Lock() bool {
-	resp := genericGet(os.Getenv("MP_URL") + "/lock")
+func (mp MissionPlanner) Lock() bool {
+	resp := genericGet(mp.url + "/lock")
 	return resp.StatusCode == http.StatusOK
 }
 
-func Unlock() bool {
-	resp := genericGet(os.Getenv("MP_URL") + "/unlock")
+func (mp MissionPlanner) Unlock() bool {
+	resp := genericGet(mp.url + "/unlock")
 	return resp.StatusCode == http.StatusOK
 }
 
-func SetQueue(waypoints []models.Waypoint) bool {
+func (mp MissionPlanner) SetQueue(waypoints []models.Waypoint) bool {
 	var mpArr []mpWaypoint
 	for _, wp := range waypoints {
 		mpwp := mpWaypoint{
@@ -142,12 +142,12 @@ func SetQueue(waypoints []models.Waypoint) bool {
 		log.Fatal("[MP Functions] Error marshalling waypoint queue")
 	}
 
-	resp := genericPost(os.Getenv("MP_URL")+"/queue", json)
+	resp := genericPost(mp.url+"/queue", json)
 
 	return resp.StatusCode == http.StatusOK
 }
 
-func Takeoff(alt float64) bool {
+func (mp MissionPlanner) Takeoff(alt float64) bool {
 	json, err := json.Marshal(map[string]float64{
 		"altitude": alt,
 	})
@@ -161,7 +161,7 @@ func Takeoff(alt float64) bool {
 	return resp.StatusCode == http.StatusOK
 }
 
-func SetHome(waypoint models.Waypoint) bool {
+func (mp MissionPlanner) SetHome(waypoint models.Waypoint) bool {
 	mpwp := mpWaypoint{
 		ID:        waypoint.ID,
 		Name:      waypoint.Name,
@@ -176,12 +176,12 @@ func SetHome(waypoint models.Waypoint) bool {
 		log.Fatal("[MP Functions] Error marshalling waypoint!")
 	}
 
-	resp := genericPost(os.Getenv("MP_URL")+"/home", json)
+	resp := genericPost(mp.url+"/home", json)
 
 	return resp.StatusCode == http.StatusOK
 }
 
-func SetFlightMode(mode string, drone string, altStandard string) bool {
+func (mp MissionPlanner) SetFlightMode(mode string, drone string, altStandard string) bool {
 	json, err := json.Marshal(map[string]string{
 		"flight_mode":       mode,
 		"drone_type":        drone,
@@ -192,7 +192,7 @@ func SetFlightMode(mode string, drone string, altStandard string) bool {
 		log.Fatal("[MP Functions] Error marshalling flight modes")
 	}
 
-	resp := genericPost(os.Getenv("MP_URL")+"/flightmode", json)
+	resp := genericPost(mp.url+"/flightmode", json)
 
 	return resp.StatusCode == http.StatusOK
 }
