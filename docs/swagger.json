@@ -341,11 +341,14 @@
                 "parameters": [
                     {
                         "description": "Waypoint IDs",
-                        "name": "id",
+                        "name": "ids",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.WaypointIDs"
+                            "type": "array",
+                            "items": {
+                                "type": "integer"
+                            }
                         }
                     }
                 ],
@@ -509,23 +512,6 @@
                     "type": "string",
                     "x-order": "8",
                     "example": "Task 1 Landing Zone"
-                }
-            }
-        },
-        "models.WaypointIDs": {
-            "type": "object",
-            "properties": {
-                "ids": {
-                    "description": "IDs is an array of strings because idk how to implement\n\t\tcustom unmarshalling of the json strings into ints.\n\t\tI have chosen to simply convert the strings to integers\n\t\tin the route function in waypoint_controller.go (see DeleteWaypointBatch())s\n\t\tPlease lmk if there is a way to do this in the unmarshalling process\n\t\tinstead of the actual route.",
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    },
-                    "example": [
-                        "1",
-                        "2",
-                        "3"
-                    ]
                 }
             }
         },
