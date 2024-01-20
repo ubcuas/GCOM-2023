@@ -4,6 +4,7 @@ import (
 	"gcom-backend/models"
 	"gcom-backend/responses"
 	"net/http"
+	"strconv"
 
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
@@ -52,4 +53,51 @@ func CreateGroundObject(c echo.Context) error {
 	return c.JSON(http.StatusOK, responses.GroundObjectResponse{
 		Message:  "Ground Object Created!",
 		GroundObject: ground_object})
+}
+
+func EditGroundObject(c echo.Context) error {
+	groundObjectStringId := c.Param("groundObjectId")
+	var groundObject models.GroundObject
+	db, _ := c.Get("db").(*gorm.DB)
+
+	groundObjectId, castErr := strconv.Atoi(groundObjectStringId)
+	bindErr := c.Bind(&groundObject)
+
+	if castErr != nil {
+		return c.JSON(http.StatusBadRequest, responses.ErrorResponse{
+			Message: "Invalid ID",
+			Data:    castErr.Error()})
+	}
+
+	if bindErr != nil {
+		return c.JSON(http.StatusBadRequest, responses.ErrorResponse{
+			Message: "Invalid JSON format",
+			Data:    bindErr.Error()})
+	}
+
+	if groundObject.ID != 0 {
+		return c.JSON(http.StatusBadRequest, responses.ErrorResponse{
+			Message: "ID is not editable"})
+	}
+
+	updateAction := db.Model(&models.GroundObject{}).
+		Where("id = ?", groundObjectId).
+		Updates(&groundObject)
+
+	if updateAction.Error != nil {
+		return c.JSON(http.StatusInternalServerError, responses.ErrorResponse{
+			Message: "An error occurred updating the ground object",
+			Data:    updateAction.Error.Error()})
+	} else if updateAction.RowsAffected < 1 {
+		return c.JSON(http.StatusNotFound, responses.ErrorResponse{
+			Message: "No such ground object exists!"})
+	}
+
+	var updatedGroundObject models.GroundObject
+	db.First(&updatedGroundObject, groundObjectId)
+
+	return c.JSON(http.StatusOK, responses.GroundObjectResponse{
+		Message:  "Ground Object Updated!",
+		GroundObject: updatedGroundObject,
+	})
 }
