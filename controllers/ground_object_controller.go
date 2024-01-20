@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"errors"
 	"gcom-backend/models"
 	"gcom-backend/responses"
 	"net/http"
@@ -99,5 +100,25 @@ func EditGroundObject(c echo.Context) error {
 	return c.JSON(http.StatusOK, responses.GroundObjectResponse{
 		Message:  "Ground Object Updated!",
 		GroundObject: updatedGroundObject,
+	})
+}
+
+
+func GetGroundObject(c echo.Context) error {
+	groundObjectId := c.Param("groundObjectId")
+	var groundObject models.GroundObject
+	db, _ := c.Get("db").(*gorm.DB)
+
+	if err := db.First(&groundObject, groundObjectId).Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		return c.JSON(http.StatusNotFound, responses.ErrorResponse{
+			Message: "No such groundObject exists!"})
+	} else if err != nil {
+		return c.JSON(http.StatusInternalServerError, responses.ErrorResponse{
+			Message: "Error whilst querying ground object!"})
+	}
+
+	return c.JSON(http.StatusOK, responses.GroundObjectResponse{
+		Message:  "Ground object Found!",
+		GroundObject: groundObject,
 	})
 }
