@@ -111,7 +111,7 @@ func GetGroundObject(c echo.Context) error {
 
 	if err := db.First(&groundObject, groundObjectId).Error; errors.Is(err, gorm.ErrRecordNotFound) {
 		return c.JSON(http.StatusNotFound, responses.ErrorResponse{
-			Message: "No such groundObject exists!"})
+			Message: "No such ground object exists!"})
 	} else if err != nil {
 		return c.JSON(http.StatusInternalServerError, responses.ErrorResponse{
 			Message: "Error whilst querying ground object!"})
@@ -120,5 +120,24 @@ func GetGroundObject(c echo.Context) error {
 	return c.JSON(http.StatusOK, responses.GroundObjectResponse{
 		Message:  "Ground object Found!",
 		GroundObject: groundObject,
+	})
+}
+
+func DeleteGroundObject(c echo.Context) error {
+	db, _ := c.Get("db").(*gorm.DB)
+	groundObjectId := c.Param("groundObjectId")
+
+	dbAction := db.Delete(&models.GroundObject{}, groundObjectId)
+	if err := dbAction.Error; err != nil {
+		return c.JSON(http.StatusInternalServerError, responses.ErrorResponse{
+			Message: "Error whilst deleting ground object!"})
+	} else if dbAction.RowsAffected < 1 {
+		return c.JSON(http.StatusNotFound, responses.ErrorResponse{
+			Message: "No such ground object exists!"})
+	}
+
+	return c.JSON(http.StatusOK, responses.GroundObjectResponse{
+		Message:  "Ground object Deleted!",
+		GroundObject: models.GroundObject{},
 	})
 }
