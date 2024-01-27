@@ -15,9 +15,9 @@ import (
 //	@Description	Get the status of all current air objects (drones)
 //	@Tags			AirObject
 //	@Produce		json
-//	@Success		200	{object}	models.Drone	"Success"
-//	@Failure		404	{object}	responses.ErrorResponse "Objects not found"
-//	@Failure		500	{object}	responses.ErrorResponse "Internal error querying AirObjects"
+//	@Success		200	{object}	models.Drone			"Success"
+//	@Failure		404	{object}	responses.ErrorResponse	"Objects not found"
+//	@Failure		500	{object}	responses.ErrorResponse	"Internal error querying AirObjects"
 //	@Router			/air_object [get]
 func GetAirObjects(c echo.Context) error {
 	var airObjects []models.AirObject
