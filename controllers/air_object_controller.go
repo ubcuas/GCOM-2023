@@ -15,9 +15,9 @@ import (
 //	@Description	Get the status of all current air objects (drones)
 //	@Tags			AirObject
 //	@Produce		json
-//	@Success		200	{object}	models.Drone			"Success"
-//	@Failure		404	{object}	responses.ErrorResponse	"Objects not found"
-//	@Failure		500	{object}	responses.ErrorResponse	"Internal error querying AirObjects"
+//	@Success		200	{object}	responses.AirObjectsResponse	"Success"
+//	@Failure		404	{object}	responses.ErrorResponse			"Objects not found"
+//	@Failure		500	{object}	responses.ErrorResponse			"Internal error querying AirObjects"
 //	@Router			/air_object [get]
 func GetAirObjects(c echo.Context) error {
 	var airObjects []models.AirObject
@@ -42,9 +42,9 @@ func GetAirObjects(c echo.Context) error {
 //	@Description	Delete all AirObjects (remoteID drones)
 //	@Tags			AirObject
 //	@Produce		json
-//	@Success		200	{object}	responses.WaypointResponse	"Success (returns a blank Waypoint)"
-//	@Failure		500	{object}	responses.ErrorResponse		"Internal Error Deleting Waypoint"
-//	@Router			/air_objects [delete]
+//	@Success		200	{object}	responses.AirObjectsResponse	"Success (returns a empty array)"
+//	@Failure		500	{object}	responses.ErrorResponse			"Internal Error Deleting AirObjects"
+//	@Router			/air_object [delete]
 func DeleteAirObjects(c echo.Context) error {
 	db, _ := c.Get("db").(*gorm.DB)
 	// gorm doesn't support global batch deleting without a where clause
@@ -56,7 +56,8 @@ func DeleteAirObjects(c echo.Context) error {
 		})
 	}
 	return c.JSON(http.StatusOK, responses.AirObjectsResponse{
-		Message: "All AirObjects deleted!",
+		Message:    "All AirObjects deleted!",
+		AirObjects: []models.AirObject{},
 	})
 }
 
@@ -67,10 +68,10 @@ func DeleteAirObjects(c echo.Context) error {
 //	@Tags			AirObject
 //	@Accept			json
 //	@Produce		json
-//	@Param			waypoints	body		[]models.AirObject			true	"Array of Waypoint Data"
-//	@Success		200			{object}	responses.WaypointsResponse	"Success"
-//	@Failure		400			{object}	responses.ErrorResponse		"Invalid JSON or AirObject Data"
-//	@Failure		500			{object}	responses.ErrorResponse		"Internal Error Creating AirObjects"
+//	@Param			airObjects	body		[]models.AirObject				true	"Array of AirObject Data"
+//	@Success		200			{object}	responses.AirObjectsResponse	"Success"
+//	@Failure		400			{object}	responses.ErrorResponse			"Invalid JSON or AirObject Data"
+//	@Failure		500			{object}	responses.ErrorResponse			"Internal Error Creating AirObjects"
 //	@Router			/air_object [post]
 func CreateAirObjects(c echo.Context) error {
 	var airObjects []models.AirObject
