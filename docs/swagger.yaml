@@ -1,6 +1,43 @@
 consumes:
 - application/json
 definitions:
+  models.AirObject:
+    description: describes the information from remoteID of other present drones.
+    properties:
+      altitude:
+        example: 75
+        type: number
+      heading:
+        example: 12
+        type: number
+      id:
+        example: FIN87astrdge12k8
+        type: string
+      latitude:
+        example: -123.245995
+        type: number
+      longitude:
+        example: 49.260605
+        type: number
+      speed:
+        example: 0.56
+        type: number
+      timestamp:
+        example: 1700905713
+        type: integer
+      v_speed:
+        example: -1.2
+        type: number
+    required:
+    - altitude
+    - heading
+    - id
+    - latitude
+    - longitude
+    - speed
+    - timestamp
+    - v_speed
+    type: object
   models.Designation:
     description: Describes a special purpose for a Waypoint
     enum:
@@ -106,6 +143,17 @@ definitions:
     - long
     - name
     type: object
+  responses.AirObjectsResponse:
+    description: Describes a response with multiple waypoints
+    properties:
+      air_objects:
+        items:
+          $ref: '#/definitions/models.AirObject'
+        type: array
+      message:
+        example: Sample success message
+        type: string
+    type: object
   responses.ErrorResponse:
     description: JSON response for any error
     properties:
@@ -145,6 +193,74 @@ info:
   title: GCOM Backend
   version: "1.0"
 paths:
+  /air_object:
+    delete:
+      description: Delete all AirObjects (remoteID drones)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success (returns a empty array)
+          schema:
+            $ref: '#/definitions/responses.AirObjectsResponse'
+        "500":
+          description: Internal Error Deleting AirObjects
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      summary: Delete all AirObjects
+      tags:
+      - AirObject
+    get:
+      description: Get the status of all current air objects (drones)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/responses.AirObjectsResponse'
+        "404":
+          description: Objects not found
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "500":
+          description: Internal error querying AirObjects
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      summary: Get air objects
+      tags:
+      - AirObject
+    post:
+      consumes:
+      - application/json
+      description: Create multiple AirObjects for remoteID based on JSON array.
+      parameters:
+      - description: Array of AirObject Data
+        in: body
+        name: airObjects
+        required: true
+        schema:
+          items:
+            $ref: '#/definitions/models.AirObject'
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/responses.AirObjectsResponse'
+        "400":
+          description: Invalid JSON or AirObject Data
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "500":
+          description: Internal Error Creating AirObjects
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      summary: Create multiple AirObjects
+      tags:
+      - AirObject
   /status:
     get:
       description: Get the current status of the drone

@@ -9,7 +9,7 @@ import "gorm.io/gorm"
 */
 
 func Migrate(db *gorm.DB) {
-	err := db.AutoMigrate(&Waypoint{}, &Drone{})
+	err := db.AutoMigrate(&Waypoint{}, &Drone{}, &AirObject{})
 	if err != nil {
 		panic(err)
 	}
