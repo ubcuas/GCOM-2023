@@ -69,7 +69,8 @@ func main() {
 	e.GET("/drone/rtl", controllers.RTL)
 	e.GET("/drone/lock", controllers.Lock)
 	e.GET("/drone/unlock", controllers.Unlock)
-	e.GET("/drone/queue", controllers.)
+	e.GET("/drone/queue", controllers.GetQueue)
+	e.POST("/drone/queue", controllers.PostQueue)
 
 	//Websockets
 	e.Any("/socket.io/", controllers.WebsocketHandler())

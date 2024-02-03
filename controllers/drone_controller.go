@@ -3,6 +3,8 @@ package controllers
 import (
 	"encoding/json"
 	"gcom-backend/configs"
+	"gcom-backend/models"
+	"gcom-backend/responses"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -87,10 +89,31 @@ func Unlock(c echo.Context) error {
 }
 
 func GetQueue(c echo.Context) error {
-	return nil
+	mp := c.Get("mp").(*configs.MissionPlanner)
+	var queue = mp.GetQueue()
+	return c.JSON(http.StatusOK, queue)
 }
 
 func PostQueue(c echo.Context) error {
-	return nil
-}
+	mp := c.Get("mp").(*configs.MissionPlanner)
+	var queue []models.Waypoint
+	if err := c.Bind(&queue); err != nil {
+		return c.JSON(http.StatusBadRequest, responses.ErrorResponse{
+			Message: "Invalid JSON format",
+			Data:    err.Error()})
+	}
 
+	for i := 0; i < len(queue); i++ {
+		if validationErr := validate.Struct(&(queue[i])); validationErr != nil {
+			return c.JSON(http.StatusBadRequest, responses.ErrorResponse{
+				Message: "Invalid waypoints data",
+				Data:    validationErr.Error()})
+		}
+	}
+	println("wtf")
+	if mp.SetQueue(queue) {
+		return c.HTML(http.StatusAccepted, "")
+	} else {
+		return c.HTML(http.StatusInternalServerError, "")
+	}
+}
