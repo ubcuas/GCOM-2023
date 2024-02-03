@@ -175,7 +175,6 @@ func (mp MissionPlanner) SetQueue(waypoints []models.Waypoint) bool {
 	if err != nil {
 		log.Fatal("[MP Functions] Error marshalling waypoint queue")
 	}
-	println(json)
 	resp := genericPost(mp.url+"/queue", json)
 
 	return resp.StatusCode == http.StatusOK

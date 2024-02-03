@@ -110,7 +110,6 @@ func PostQueue(c echo.Context) error {
 				Data:    validationErr.Error()})
 		}
 	}
-	println("wtf")
 	if mp.SetQueue(queue) {
 		return c.HTML(http.StatusAccepted, "")
 	} else {
