@@ -18,10 +18,10 @@ import (
 //	@Tags			Payload
 //	@Accept			json
 //	@Produce		json
-//	@Param			object		body		models.Payload				true	"Payload Data"
-//	@Success		200			{object}	responses.PayloadResponse	"Success"
-//	@Failure		400			{object}	responses.ErrorResponse		"Invalid JSON or Payload Data"
-//	@Failure		500			{object}	responses.ErrorResponse		"Internal Error Payload"
+//	@Param			object	body		models.Payload				true	"Payload Data"
+//	@Success		200		{object}	responses.PayloadResponse	"Success"
+//	@Failure		400		{object}	responses.ErrorResponse		"Invalid JSON or Payload Data"
+//	@Failure		500		{object}	responses.ErrorResponse		"Internal Error Payload"
 //	@Router			/payload [post]
 func CreatePayload(c echo.Context) error {
 	var payload models.Payload   
