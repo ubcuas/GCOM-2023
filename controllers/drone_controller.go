@@ -110,7 +110,30 @@ func PostQueue(c echo.Context) error {
 				Data:    validationErr.Error()})
 		}
 	}
+
 	if mp.SetQueue(queue) {
+		return c.HTML(http.StatusAccepted, "")
+	} else {
+		return c.HTML(http.StatusInternalServerError, "")
+	}
+}
+
+func PostHome(c echo.Context) error {
+	mp := c.Get("mp").(*configs.MissionPlanner)
+	var wp models.Waypoint
+	if err := c.Bind(&wp); err != nil {
+		return c.JSON(http.StatusBadRequest, responses.ErrorResponse{
+			Message: "Invalid JSON format",
+			Data:    err.Error()})
+	}
+
+	if validationErr := validate.Struct(&wp); validationErr != nil {
+		return c.JSON(http.StatusBadRequest, responses.ErrorResponse{
+			Message: "Invalid waypoint data",
+			Data:    validationErr.Error()})
+	}
+
+	if mp.SetHome(wp) {
 		return c.HTML(http.StatusAccepted, "")
 	} else {
 		return c.HTML(http.StatusInternalServerError, "")
