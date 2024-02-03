@@ -1,7 +1,6 @@
 package configs
 
 import (
-	"errors"
 	"net/http"
 
 	"bytes"
@@ -9,20 +8,8 @@ import (
 	"gcom-backend/models"
 	"io"
 	"log"
-	"os"
+	"time"
 )
-
-// type MissionPlannerWrapper interface {
-// 	GetQueue()
-// 	PostQueue(waypoints []models.Waypoint)
-// 	GetStatus()
-// 	Lock()
-// 	Unlock()
-// 	Takeoff(altitude float64)
-// 	Land()
-// 	ReturnHome()
-// 	SetHome(waypoint models.Waypoint)
-// }
 
 type MissionPlanner struct {
 	url string
@@ -30,15 +17,18 @@ type MissionPlanner struct {
 
 // ConnectMissionPlanner creates a new instance of MissionPlanner - this should only be in main.go
 func ConnectMissionPlanner(url string) (*MissionPlanner, error) {
+	return &MissionPlanner{
+		url: url,
+	}, nil
 	//Assumes method of checking if MP is alive
-	res, err := http.Get(url)
-	if err != nil && res.StatusCode == 200 {
-		return &MissionPlanner{
-			url: url,
-		}, nil
-	} else {
-		return nil, errors.New("missionplanner unreachable at provided url")
-	}
+	// _, err := http.Get(url)
+	// if err != nil {
+	// 	return &MissionPlanner{
+	// 		url: url,
+	// 	}, nil
+	// } else {
+	// 	return nil, errors.New("missionplanner unreachable at provided url")
+	// }
 }
 
 type mpWaypoint struct {
@@ -49,9 +39,21 @@ type mpWaypoint struct {
 	Altitude  float64 `json:"altitude"`
 }
 
+type mpDrone struct {
+	Velocity       float64 `json:"airspeed"`
+	Longitude      float64 `json:"longitude"`
+	Latitude       float64 `json:"latitude"`
+	Altitude       float64 `json:"altitude"`
+	Heading        float64 `json:"heading"`
+	BatteryVoltage float64 `json:"batteryvoltage"`
+}
+
 func genericGet(url string) *http.Response {
+	println(url)
 	resp, err := http.Get(url)
 	if err != nil {
+		println(url)
+		println(err.Error())
 		log.Fatal("[MP Functions] Failed running GET")
 	}
 
@@ -62,6 +64,9 @@ func genericPost(url string, json []byte) *http.Response {
 	jsonBody := bytes.NewBuffer(json)
 	resp, err := http.Post(url, "application/json", jsonBody)
 	if err != nil {
+		println(url)
+		println(jsonBody)
+		println(err.Error())
 		log.Fatal("[MP Functions] Failed running POST")
 	}
 
@@ -98,12 +103,37 @@ func (mp MissionPlanner) GetQueue() []models.Waypoint {
 	return ans
 }
 
-func (mp MissionPlanner) GetStatus() *http.Response {
-	return genericGet(mp.url + "/status")
+func (mp MissionPlanner) GetStatus() models.Drone {
+	resp := genericGet(mp.url + "/status")
+	var respDrone mpDrone
+	defer resp.Body.Close()
+	body, err := io.ReadAll(resp.Body)
+
+	if err != nil {
+		log.Fatal("[MP Functions] Error decoding /status response")
+	}
+
+	if err := json.Unmarshal(body, &respDrone); err != nil {
+		log.Fatal("[MP Functions] Error unmarshalling MP Status")
+	}
+
+	var ans = models.Drone{
+		Timestamp:      time.Now().Unix(),
+		Latitude:       respDrone.Latitude,
+		Longitude:      respDrone.Longitude,
+		Altitude:       respDrone.Altitude,
+		VerticalSpeed:  0.0,
+		Speed:          respDrone.Velocity,
+		Heading:        respDrone.Heading,
+		BatteryVoltage: respDrone.BatteryVoltage,
+	}
+
+	return ans
 }
 
 func (mp MissionPlanner) ReturnHome() bool {
 	resp := genericGet(mp.url + "/rtl")
+	println(resp.StatusCode)
 	return resp.StatusCode == http.StatusOK
 }
 
@@ -156,7 +186,7 @@ func (mp MissionPlanner) Takeoff(alt float64) bool {
 		log.Fatal("[MP Functions] Error marshalling altitude for takeoff")
 	}
 
-	resp := genericPost(os.Getenv("MP_URL"+"/takeoff"), json)
+	resp := genericPost(mp.url+"/takeoff", json)
 
 	return resp.StatusCode == http.StatusOK
 }

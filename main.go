@@ -64,6 +64,9 @@ func main() {
 	//Drone
 	e.GET("/status", controllers.GetCurrentStatus)
 	e.GET("/status/history", controllers.GetStatusHistory)
+	e.POST("/drone/takeoff", controllers.Takeoff)
+	e.GET("/drone/land", controllers.Land)
+	e.GET("/drone/rtl", controllers.RTL)
 
 	//Websockets
 	e.Any("/socket.io/", controllers.WebsocketHandler())
