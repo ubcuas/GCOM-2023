@@ -11,7 +11,7 @@ import (
 	"gorm.io/gorm"
 )
 
-// CreatePayload creates a paylod
+// CreatePayload creates a payload
 //
 //	@Summary		Create a payload
 //	@Description	Create a singular payload based on JSON, must have sentinel ID of "-1"
@@ -24,8 +24,8 @@ import (
 //	@Failure		500		{object}	responses.ErrorResponse		"Internal Error Payload"
 //	@Router			/payload [post]
 func CreatePayload(c echo.Context) error {
-	var payload models.Payload   
-	db, _ := c.Get("db").(*gorm.DB) 
+	var payload models.Payload
+	db, _ := c.Get("db").(*gorm.DB)
 
 	if err := c.Bind(&payload); err != nil {
 		return c.JSON(http.StatusBadRequest, responses.ErrorResponse{
@@ -52,10 +52,24 @@ func CreatePayload(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, responses.PayloadResponse{
-		Message:  "Payload Created!",
+		Message: "Payload Created!",
 		Payload: payload})
 }
 
+// EditPayload edits a payload
+//
+//	@Summary		Edit a payload.
+//	@Description	Edit a singular payload based on path param and JSON
+//	@Tags			Payload
+//	@Accept			json
+//	@Produce		json
+//	@Param			id		path		int							true	"Payload ID"
+//	@Param			fields	body		string						true	"JSON fields"	example({"name": "Whiskey"})
+//	@Success		200		{object}	responses.PayloadResponse	"Success"
+//	@Failure		400		{object}	responses.ErrorResponse		"Invalid JSON or Payload ID"
+//	@Failure		404		{object}	responses.ErrorResponse		"Payload Not Found"
+//	@Failure		500		{object}	responses.ErrorResponse		"Internal Error Editing Payload"
+//	@Router			/payload/{id} [patch]
 func EditPayload(c echo.Context) error {
 	payloadStringId := c.Param("payloadId")
 	var payload models.Payload
@@ -98,11 +112,23 @@ func EditPayload(c echo.Context) error {
 	db.First(&updatedPayload, payloadId)
 
 	return c.JSON(http.StatusOK, responses.PayloadResponse{
-		Message:  "Payload Updated!",
+		Message: "Payload Updated!",
 		Payload: updatedPayload,
 	})
 }
 
+// GetPayload gets a payload by ID
+//
+//	@Summary		Get a payload by ID
+//	@Description	Get a singular payload based on the provided ID
+//	@Tags			Payload
+//	@Accept			json
+//	@Produce		json
+//	@Param			id	path		int							true	"Payload ID"
+//	@Success		200	{object}	responses.PayloadResponse	"Success"
+//	@Failure		404	{object}	responses.ErrorResponse		"Payload Not Found"
+//	@Failure		500	{object}	responses.ErrorResponse		"Internal Error Querying Payload"
+//	@Router			/payload/{id} [get]
 func GetPayload(c echo.Context) error {
 	payloadId := c.Param("payloadId")
 	var payload models.Payload
@@ -117,11 +143,23 @@ func GetPayload(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, responses.PayloadResponse{
-		Message:  "Payload Found!",
+		Message: "Payload Found!",
 		Payload: payload,
 	})
 }
 
+// DeletePayload deletes a payload
+//
+//	@Summary		Delete a payload
+//	@Description	Delete a singular payload based on path param
+//	@Tags			Payload
+//	@Accept			json
+//	@Produce		json
+//	@Param			id	path		int							true	"Payload ID"
+//	@Success		200	{object}	responses.PayloadResponse	"Success (returns a blank Payload)"
+//	@Failure		404	{object}	responses.ErrorResponse		"Payload Not Found"
+//	@Failure		500	{object}	responses.ErrorResponse		"Internal Error Deleting Payload"
+//	@Router			/ground_object/{id} [delete]
 func DeletePayload(c echo.Context) error {
 	db, _ := c.Get("db").(*gorm.DB)
 	payloadId := c.Param("payloadId")
@@ -136,7 +174,7 @@ func DeletePayload(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, responses.PayloadResponse{
-		Message:  "Payload Deleted!",
+		Message: "Payload Deleted!",
 		Payload: models.Payload{},
 	})
 }
