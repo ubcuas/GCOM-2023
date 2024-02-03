@@ -67,3 +67,30 @@ func RTL(c echo.Context) error {
 		return c.HTML(http.StatusInternalServerError, "")
 	}
 }
+
+func Lock(c echo.Context) error {
+	mp := c.Get("mp").(*configs.MissionPlanner)
+	if mp.Lock() {
+		return c.HTML(http.StatusAccepted, "")
+	} else {
+		return c.HTML(http.StatusInternalServerError, "")
+	}
+}
+
+func Unlock(c echo.Context) error {
+	mp := c.Get("mp").(*configs.MissionPlanner)
+	if mp.Unlock() {
+		return c.HTML(http.StatusAccepted, "")
+	} else {
+		return c.HTML(http.StatusInternalServerError, "")
+	}
+}
+
+func GetQueue(c echo.Context) error {
+	return nil
+}
+
+func PostQueue(c echo.Context) error {
+	return nil
+}
+

@@ -12,13 +12,15 @@ import (
 )
 
 type MissionPlanner struct {
-	url string
+	url  string
+	lock bool
 }
 
 // ConnectMissionPlanner creates a new instance of MissionPlanner - this should only be in main.go
 func ConnectMissionPlanner(url string) (*MissionPlanner, error) {
 	return &MissionPlanner{
-		url: url,
+		url:  url,
+		lock: false,
 	}, nil
 	//Assumes method of checking if MP is alive
 	// _, err := http.Get(url)
@@ -144,11 +146,13 @@ func (mp MissionPlanner) Land() bool {
 
 func (mp MissionPlanner) Lock() bool {
 	resp := genericGet(mp.url + "/lock")
+	mp.lock = true
 	return resp.StatusCode == http.StatusOK
 }
 
 func (mp MissionPlanner) Unlock() bool {
 	resp := genericGet(mp.url + "/unlock")
+	mp.lock = false
 	return resp.StatusCode == http.StatusOK
 }
 
