@@ -1,9 +1,12 @@
 package controllers
 
 import (
+	"encoding/json"
 	"errors"
+	"fmt"
 	"gcom-backend/models"
 	"gcom-backend/responses"
+	"io"
 	"net/http"
 	"strconv"
 
@@ -71,8 +74,55 @@ func CreateWaypoint(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, responses.WaypointResponse{
-		Message:  "Waypoint Created!",
+		Message:  "Waypoint created!",
 		Waypoint: waypoint})
+}
+
+// CreateWaypointBatch creates multiple waypoints
+//
+//	@Summary		Create multiple waypoints
+//	@Description	Create multiple waypoints based on JSON, all must have sentinel ID of "-1"
+//	@Tags			Waypoint
+//	@Accept			json
+//	@Produce		json
+//	@Param			waypoints	body		[]models.Waypoint			true	"Array of Waypoint Data"
+//	@Success		200			{object}	responses.WaypointsResponse	"Success"
+//	@Failure		400			{object}	responses.ErrorResponse		"Invalid JSON or Waypoint Data"
+//	@Failure		500			{object}	responses.ErrorResponse		"Internal Error Creating Waypoint"
+//	@Router			/waypoints [post]
+func CreateWaypointBatch(c echo.Context) error {
+	var waypoints []models.Waypoint
+	db, _ := c.Get("db").(*gorm.DB)
+
+	if err := c.Bind(&waypoints); err != nil {
+		return c.JSON(http.StatusBadRequest, responses.ErrorResponse{
+			Message: "Invalid JSON format",
+			Data:    err.Error()})
+	}
+
+	for i := 0; i < len(waypoints); i++ {
+		if validationErr := validate.Struct(&(waypoints[i])); validationErr != nil {
+			return c.JSON(http.StatusBadRequest, responses.ErrorResponse{
+				Message: "Invalid waypoints data",
+				Data:    validationErr.Error()})
+		}
+		if waypoints[i].ID != -1 {
+			return c.JSON(http.StatusBadRequest, responses.ErrorResponse{
+				Message: fmt.Sprintf("Non-sentinel ID passed for waypoint %d", i)})
+		} else {
+			waypoints[i].ID = 0
+		}
+
+	}
+
+	if createErr := db.Create(&waypoints).Error; createErr != nil {
+		return c.JSON(http.StatusInternalServerError, responses.ErrorResponse{
+			Message: "An error occurred creating the waypoints"})
+	}
+
+	return c.JSON(http.StatusOK, responses.WaypointsResponse{
+		Message:   "Waypoints created!",
+		Waypoints: waypoints})
 }
 
 // EditWaypoint edits a waypoint
@@ -149,7 +199,7 @@ func EditWaypoint(c echo.Context) error {
 	db.First(&updatedWaypoint, waypointId)
 
 	return c.JSON(http.StatusOK, responses.WaypointResponse{
-		Message:  "Waypoint Updated!",
+		Message:  "Waypoint updated!",
 		Waypoint: updatedWaypoint,
 	})
 }
@@ -180,7 +230,7 @@ func GetWaypoint(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, responses.WaypointResponse{
-		Message:  "Waypoint Found!",
+		Message:  "Waypoint found!",
 		Waypoint: waypoint,
 	})
 }
@@ -213,11 +263,73 @@ func DeleteWaypoint(c echo.Context) error {
 			Message: "Error whilst deleting waypoint!"})
 	} else if dbAction.RowsAffected < 1 {
 		return c.JSON(http.StatusNotFound, responses.ErrorResponse{
-			Message: "No such waypoint exists!"})
+			Message: "No requested waypoint exists!"})
 	}
 
 	return c.JSON(http.StatusOK, responses.WaypointResponse{
-		Message:  "Waypoint Deleted!",
+		Message:  "Waypoint deleted!",
+		Waypoint: models.Waypoint{},
+	})
+}
+
+// DeleteWaypointBatch deletes multiple waypoints
+//
+//	@Summary		Delete multiple waypoints
+//	@Description	Delete multiple waypoints based on json body
+//	@Tags			Waypoint
+//	@Accept			json
+//	@Produce		json
+//	@Param			ids	body		[]int						true	"Waypoint IDs"
+//	@Success		200	{object}	responses.WaypointResponse	"Success (returns a blank Waypoint)"
+//	@Failure		400	{object}	responses.ErrorResponse		"Invalid JSON or Waypoint IDs"
+//	@Failure		404	{object}	responses.ErrorResponse		"Waypoints Not Found"
+//	@Failure		500	{object}	responses.ErrorResponse		"Internal Error Deleting Waypoint"
+//	@Router			/waypoints [delete]
+func DeleteWaypointBatch(c echo.Context) error {
+	db, _ := c.Get("db").(*gorm.DB)
+	/*
+		Instead of specifying one waypoint to delete through the uri param,
+		multiple waypoint ids will be represented through json as an array of ints.
+	*/
+	body, _ := io.ReadAll(c.Request().Body) // not sure if reading the body into bytes needs err handling.
+
+	// Direct unmarshalling of data; No binding overhead
+	var waypointIDs []int
+	if marshalErr := json.Unmarshal(body, &waypointIDs); marshalErr != nil {
+		// Will error out due to invalid format, ex. [1,2,"a"]
+		return c.JSON(http.StatusBadRequest, responses.ErrorResponse{
+			Message: "Invalid JSON/ID format",
+			Data:    marshalErr.Error()})
+	}
+
+	// ID verification
+	for _, id := range waypointIDs {
+		// Negative id check
+		if id < 0 {
+			return c.JSON(http.StatusBadRequest, responses.ErrorResponse{
+				Message: "Invalid ID; Negative ID entered"})
+		}
+		// Check id exists before any deletion; prevents partial deletion
+		var waypointTBValidated = models.Waypoint{}
+		if err := db.First(&waypointTBValidated, id).Error; errors.Is(err, gorm.ErrRecordNotFound) {
+			return c.JSON(http.StatusNotFound, responses.ErrorResponse{
+				Message: fmt.Sprintf("Requested waypoint %d does not exist!", id),
+				Data:    err.Error()})
+		}
+	}
+
+	for _, id := range waypointIDs {
+		dbAction := db.Delete(&models.Waypoint{}, id)
+		// Theoretically shouldn't error out after validation, extra validation
+		// must be implemented if db.Delete errors out.
+		if err := dbAction.Error; err != nil {
+			return c.JSON(http.StatusInternalServerError, responses.ErrorResponse{
+				Message: fmt.Sprintf("Error whilst deleting waypoint with id %d", id)})
+		}
+	}
+
+	return c.JSON(http.StatusOK, responses.WaypointResponse{
+		Message:  "Waypoints deleted!",
 		Waypoint: models.Waypoint{},
 	})
 }
@@ -248,8 +360,7 @@ func GetAllWaypoints(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, responses.WaypointsResponse{
-		Message:   "Waypoint Found!",
+		Message:   "Waypoint found!",
 		Waypoints: waypoints,
 	})
-
 }
