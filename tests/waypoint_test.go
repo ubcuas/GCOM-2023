@@ -56,7 +56,7 @@ func (s *WaypointTestSuite) TearDownSuite() {
 		fmt.Println("[Teardown] Error closing database connection!")
 	}
 
-	err = os.Remove("./database.db")
+	err = os.Remove("./db/database.db")
 
 	if err != nil {
 		fmt.Println("[Teardown] Error deleting database!")
