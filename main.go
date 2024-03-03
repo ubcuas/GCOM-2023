@@ -3,12 +3,13 @@ package main
 import (
 	"gcom-backend/configs"
 	"gcom-backend/controllers"
-	_ "gcom-backend/docs"
+	"gcom-backend/docs"
 	"gcom-backend/util"
 	"log"
 	"os"
 
 	"github.com/joho/godotenv"
+
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	echoSwagger "github.com/swaggo/echo-swagger"
@@ -56,10 +57,24 @@ func main() {
 
 	//Waypoints
 	e.POST("/waypoint", controllers.CreateWaypoint)
+	e.POST("/waypoints", controllers.CreateWaypointBatch)
 	e.PATCH("/waypoint/:waypointId", controllers.EditWaypoint)
 	e.GET("/waypoint/:waypointId", controllers.GetWaypoint)
 	e.DELETE("/waypoint/:waypointId", controllers.DeleteWaypoint)
+	e.DELETE("/waypoints", controllers.DeleteWaypointBatch)
 	e.GET("/waypoints", controllers.GetAllWaypoints)
+
+	//Ground Object
+	e.POST("/ground_object", controllers.CreateGroundObject)
+	e.PATCH("/ground_object/:groundObjectId", controllers.EditGroundObject)
+	e.GET("/ground_object/:groundObjectId", controllers.GetGroundObject)
+	e.DELETE("/ground_object/:groundObjectId", controllers.DeleteGroundObject)
+
+	//Payload
+	e.POST("/payload", controllers.CreatePayload)
+	e.PATCH("/payload:payloadId", controllers.EditPayload)
+	e.GET("/payload:payloadId", controllers.GetPayload)
+	e.DELETE("/payload/:payloadID", controllers.DeletePayload)
 
 	//Drone
 	e.GET("/status", controllers.GetCurrentStatus)
@@ -73,8 +88,13 @@ func main() {
 	e.POST("/drone/queue", controllers.PostQueue)
 	e.POST("/drone/home", controllers.PostHome)
 
+	//AirObjects
+	e.GET("/air_object", controllers.GetAirObjects)
+	e.DELETE("/air_object", controllers.DeleteAirObjects)
+	e.POST("/air_object", controllers.CreateAirObjects)
+
 	//Websockets
 	e.Any("/socket.io/", controllers.WebsocketHandler())
 
-	e.Logger.Fatal(e.Start(":1323"))
+	e.Logger.Fatal(e.Start("localhost:1323"))
 }
