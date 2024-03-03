@@ -26,7 +26,7 @@ import (
 //	@Tags		Waypoints
 
 func main() {
-	db := configs.Connect()
+	db := configs.Connect(false)
 
 	e := echo.New()
 
