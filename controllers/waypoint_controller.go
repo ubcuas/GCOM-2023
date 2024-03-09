@@ -133,7 +133,7 @@ func CreateWaypointBatch(c echo.Context) error {
 //	@Accept			json
 //	@Produce		json
 //	@Param			id		path		int							true	"Waypoint ID"
-//	@Param			fields	body		string						true	"JSON fields"	example({"name": "Whiskey"})
+//	@Param			fields	body		string						true	"JSON fields"	example({"name": "Whiskey})
 //	@Success		200		{object}	responses.WaypointResponse	"Success"
 //	@Failure		400		{object}	responses.ErrorResponse		"Invalid JSON or Waypoint ID"
 //	@Failure		404		{object}	responses.ErrorResponse		"Waypoint Not Found"

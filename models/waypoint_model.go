@@ -6,10 +6,10 @@ package models
 type Designation string
 
 const (
-	Launch             Designation = "launch"
-	Land               Designation = "land"
-	Obstacle           Designation = "obstacle"
-	PayloadDesignation Designation = "payload"
+	Launch   Designation = "launch"
+	Land     Designation = "land"
+	Obstacle Designation = "obstacle"
+	Payload  Designation = "payload"
 )
 
 // Waypoint describes a location
