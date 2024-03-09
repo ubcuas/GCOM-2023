@@ -119,7 +119,7 @@ func Lock(c echo.Context) error {
 //	@Tags			Drone
 //	@Success		200	body	string	"Drone unlocked successfully"
 //	@Failure		500	body	string	"Drone unable to unlock (already unlocked?)"
-//	@Router			/drone/lock [get]
+//	@Router			/drone/unlock [get]
 func Unlock(c echo.Context) error {
 	mp := c.Get("mp").(*configs.MissionPlanner)
 	if mp.Unlock() {

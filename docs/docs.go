@@ -188,13 +188,13 @@ const docTemplate = `{
                 "summary": "Halts drone in place while preserving queue",
                 "responses": {
                     "200": {
-                        "description": "Drone unlocked successfully",
+                        "description": "Drone locked successfully",
                         "schema": {
                             "type": "body"
                         }
                     },
                     "500": {
-                        "description": "Drone unable to unlock (already unlocked?)",
+                        "description": "Drone unable to lock (already locked?)",
                         "schema": {
                             "type": "body"
                         }
@@ -301,6 +301,29 @@ const docTemplate = `{
                 "responses": {
                     "200": {
                         "description": "OK"
+                    }
+                }
+            }
+        },
+        "/drone/unlock": {
+            "get": {
+                "description": "Stops drone movement while preserving existing queue",
+                "tags": [
+                    "Drone"
+                ],
+                "summary": "Halts drone in place while preserving queue",
+                "responses": {
+                    "200": {
+                        "description": "Drone unlocked successfully",
+                        "schema": {
+                            "type": "body"
+                        }
+                    },
+                    "500": {
+                        "description": "Drone unable to unlock (already unlocked?)",
+                        "schema": {
+                            "type": "body"
+                        }
                     }
                 }
             }

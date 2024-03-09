@@ -3,12 +3,10 @@ package main
 import (
 	"gcom-backend/configs"
 	"gcom-backend/controllers"
-	"gcom-backend/docs"
+	_ "gcom-backend/docs"
 	"gcom-backend/util"
 	"log"
 	"os"
-
-	"github.com/joho/godotenv"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
