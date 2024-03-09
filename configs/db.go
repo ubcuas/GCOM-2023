@@ -14,7 +14,6 @@ func Connect(test bool) *gorm.DB {
 		db_string = "./db/database.db"
 	}
 	database, err := gorm.Open(sqlite.Open(db_string), &gorm.Config{})
-
 	if err != nil {
 		panic(err)
 	}

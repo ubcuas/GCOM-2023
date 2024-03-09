@@ -5,6 +5,7 @@ go 1.19
 require (
 	github.com/go-playground/validator v9.31.0+incompatible
 	github.com/googollee/go-socket.io v1.7.0
+	github.com/joho/godotenv v1.5.1
 	github.com/labstack/echo/v4 v4.11.2
 	github.com/swaggo/echo-swagger v1.4.1
 	github.com/swaggo/swag v1.16.2
