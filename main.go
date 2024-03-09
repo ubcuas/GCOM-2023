@@ -30,12 +30,8 @@ import (
 //	@Tags		Waypoints
 
 func main() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
 
-	db := configs.ConnectDatabase()
+	db := configs.Connect(false)
 
 	mp, err := configs.ConnectMissionPlanner(os.Getenv("MP_URL"))
 	if err != nil {
@@ -96,5 +92,5 @@ func main() {
 	//Websockets
 	e.Any("/socket.io/", controllers.WebsocketHandler())
 
-	e.Logger.Fatal(e.Start("localhost:1323"))
+	e.Logger.Fatal(e.Start("0.0.0.0:1323"))
 }
