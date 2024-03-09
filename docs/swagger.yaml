@@ -50,7 +50,7 @@ definitions:
     - Launch
     - Land
     - Obstacle
-    - Payload
+    - PayloadDesignation
   models.Drone:
     description: describes the drone being flown
     properties:
@@ -96,6 +96,66 @@ definitions:
     - speed
     - timestamp
     - v_speed
+    type: object
+  models.GroundObject:
+    properties:
+      color:
+        example: blue
+        type: string
+        x-order: "4"
+      id:
+        description: To create a ground object, ID of "-1" must be passed
+        example: "-1"
+        type: string
+        x-order: "1"
+      lat:
+        example: 123.45
+        type: number
+        x-order: "8"
+      long:
+        example: -123.45
+        type: number
+        x-order: "7"
+      obj_type:
+        example: standard
+        type: string
+        x-order: "2"
+      shape:
+        example: triangle
+        type: string
+        x-order: "3"
+      text:
+        example: A
+        type: string
+        x-order: "5"
+      text_color:
+        example: green
+        type: string
+        x-order: "6"
+    required:
+    - color
+    - id
+    - lat
+    - long
+    - obj_type
+    - shape
+    - text
+    - text_color
+    type: object
+  models.Payload:
+    properties:
+      ground_object:
+        allOf:
+        - $ref: '#/definitions/models.GroundObject'
+        x-order: "2"
+      id:
+        description: To create a payload, ID of "-1" must be passed
+        example: "1"
+        type: string
+        x-order: "1"
+    required:
+    - ground_object
+    - id
     type: object
   models.Waypoint:
     description: describes a location in GCOM
@@ -162,6 +222,24 @@ definitions:
       message:
         example: Sample error message
         type: string
+    type: object
+  responses.GroundObjectResponse:
+    description: Describes a response a single ground object
+    properties:
+      ground_object:
+        $ref: '#/definitions/models.GroundObject'
+      message:
+        example: Sample success message
+        type: string
+    type: object
+  responses.PayloadResponse:
+    description: Describes a response a single payload
+    properties:
+      message:
+        example: Sample success message
+        type: string
+      payload:
+        $ref: '#/definitions/models.Payload'
     type: object
   responses.WaypointResponse:
     description: Describes a response a single waypoint
@@ -261,6 +339,347 @@ paths:
       summary: Create multiple AirObjects
       tags:
       - AirObject
+  /drone/home:
+    post:
+      consumes:
+      - application/json
+      description: Updates the home waypoint
+      parameters:
+      - description: Home Waypoint
+        in: body
+        name: waypoints
+        required: true
+        schema:
+          $ref: '#/definitions/models.Waypoint'
+      responses:
+        "200":
+          description: OK
+      summary: Updates the home waypoint
+      tags:
+      - Drone
+  /drone/land:
+    get:
+      description: Tells Drone to land
+      responses:
+        "200":
+          description: Command issued successfully
+          schema:
+            type: body
+        "500":
+          description: Command failed to be issued
+          schema:
+            type: body
+      summary: Take off Drone
+      tags:
+      - Drone
+  /drone/lock:
+    get:
+      description: Stops drone movement while preserving existing queue
+      responses:
+        "200":
+          description: Drone unlocked successfully
+          schema:
+            type: body
+        "500":
+          description: Drone unable to unlock (already unlocked?)
+          schema:
+            type: body
+      summary: Halts drone in place while preserving queue
+      tags:
+      - Drone
+  /drone/queue:
+    get:
+      description: Returns queue in Mission Planner
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Waypoint'
+            type: array
+      summary: Returns queue in Mission Planner
+      tags:
+      - Drone
+    post:
+      consumes:
+      - application/json
+      description: Sends a queue in Mission Planner
+      parameters:
+      - description: Array of Waypoint Data
+        in: body
+        name: waypoints
+        required: true
+        schema:
+          items:
+            $ref: '#/definitions/models.Waypoint'
+          type: array
+      responses:
+        "200":
+          description: OK
+      summary: Sends a queue in Mission Planner
+      tags:
+      - Drone
+  /drone/rtl:
+    get:
+      description: Tells Drone to return home and land
+      responses:
+        "200":
+          description: RTL command issued successfully
+          schema:
+            type: body
+        "500":
+          description: RTL command encountered an error
+          schema:
+            type: body
+      summary: Returns to Home and Lands
+      tags:
+      - Drone
+  /drone/takeoff:
+    post:
+      consumes:
+      - application/json
+      description: Tells Drone to takeoff
+      parameters:
+      - description: Takeoff Altitude
+        in: body
+        name: altitude
+        required: true
+        schema:
+          type: number
+      responses:
+        "200":
+          description: OK
+      summary: Take off Drone
+      tags:
+      - Drone
+  /ground_object:
+    post:
+      consumes:
+      - application/json
+      description: Create a singular ground object based on JSON, must have sentinel
+        ID of "-1"
+      parameters:
+      - description: Ground Object Data
+        in: body
+        name: object
+        required: true
+        schema:
+          $ref: '#/definitions/models.GroundObject'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/responses.GroundObjectResponse'
+        "400":
+          description: Invalid JSON or Ground Object Data
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "500":
+          description: Internal Error Creating Ground Object
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      summary: Create a ground object
+      tags:
+      - GroundObject
+  /ground_object/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a singular payload based on path param
+      parameters:
+      - description: Payload ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success (returns a blank Payload)
+          schema:
+            $ref: '#/definitions/responses.PayloadResponse'
+        "404":
+          description: Payload Not Found
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "500":
+          description: Internal Error Deleting Payload
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      summary: Delete a payload
+      tags:
+      - Payload
+    get:
+      consumes:
+      - application/json
+      description: Get a singular ground object based on the provided ID
+      parameters:
+      - description: Ground Object ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/responses.GroundObjectResponse'
+        "404":
+          description: Ground Object Not Found
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "500":
+          description: Internal Error Querying Ground Object
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      summary: Get a ground object by ID
+      tags:
+      - GroundObject
+    patch:
+      consumes:
+      - application/json
+      description: Edit a singular ground object based on path param and JSON
+      parameters:
+      - description: GroundObject ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: JSON fields
+        example: '{"name": "Whiskey"}'
+        in: body
+        name: fields
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/responses.GroundObjectResponse'
+        "400":
+          description: Invalid JSON or GroundObject ID
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "404":
+          description: GroundObject Not Found
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "500":
+          description: Internal Error Editing GroundObject
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      summary: Edit a ground object.
+      tags:
+      - GroundObject
+  /payload:
+    post:
+      consumes:
+      - application/json
+      description: Create a singular payload based on JSON, must have sentinel ID
+        of "-1"
+      parameters:
+      - description: Payload Data
+        in: body
+        name: object
+        required: true
+        schema:
+          $ref: '#/definitions/models.Payload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/responses.PayloadResponse'
+        "400":
+          description: Invalid JSON or Payload Data
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "500":
+          description: Internal Error Payload
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      summary: Create a payload
+      tags:
+      - Payload
+  /payload/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get a singular payload based on the provided ID
+      parameters:
+      - description: Payload ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/responses.PayloadResponse'
+        "404":
+          description: Payload Not Found
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "500":
+          description: Internal Error Querying Payload
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      summary: Get a payload by ID
+      tags:
+      - Payload
+    patch:
+      consumes:
+      - application/json
+      description: Edit a singular payload based on path param and JSON
+      parameters:
+      - description: Payload ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: JSON fields
+        example: '{"name": "Whiskey"}'
+        in: body
+        name: fields
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/responses.PayloadResponse'
+        "400":
+          description: Invalid JSON or Payload ID
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "404":
+          description: Payload Not Found
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "500":
+          description: Internal Error Editing Payload
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      summary: Edit a payload.
+      tags:
+      - Payload
   /status:
     get:
       description: Get the current status of the drone
@@ -388,7 +807,7 @@ paths:
         required: true
         type: integer
       - description: JSON fields
-        example: '{"name": "Whiskey}'
+        example: '{"name": "Whiskey"}'
         in: body
         name: fields
         required: true

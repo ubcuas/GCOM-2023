@@ -121,6 +121,521 @@
                 }
             }
         },
+        "/drone/home": {
+            "post": {
+                "description": "Updates the home waypoint",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Drone"
+                ],
+                "summary": "Updates the home waypoint",
+                "parameters": [
+                    {
+                        "description": "Home Waypoint",
+                        "name": "waypoints",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Waypoint"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/drone/land": {
+            "get": {
+                "description": "Tells Drone to land",
+                "tags": [
+                    "Drone"
+                ],
+                "summary": "Take off Drone",
+                "responses": {
+                    "200": {
+                        "description": "Command issued successfully",
+                        "schema": {
+                            "type": "body"
+                        }
+                    },
+                    "500": {
+                        "description": "Command failed to be issued",
+                        "schema": {
+                            "type": "body"
+                        }
+                    }
+                }
+            }
+        },
+        "/drone/lock": {
+            "get": {
+                "description": "Stops drone movement while preserving existing queue",
+                "tags": [
+                    "Drone"
+                ],
+                "summary": "Halts drone in place while preserving queue",
+                "responses": {
+                    "200": {
+                        "description": "Drone unlocked successfully",
+                        "schema": {
+                            "type": "body"
+                        }
+                    },
+                    "500": {
+                        "description": "Drone unable to unlock (already unlocked?)",
+                        "schema": {
+                            "type": "body"
+                        }
+                    }
+                }
+            }
+        },
+        "/drone/queue": {
+            "get": {
+                "description": "Returns queue in Mission Planner",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Drone"
+                ],
+                "summary": "Returns queue in Mission Planner",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Waypoint"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Sends a queue in Mission Planner",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Drone"
+                ],
+                "summary": "Sends a queue in Mission Planner",
+                "parameters": [
+                    {
+                        "description": "Array of Waypoint Data",
+                        "name": "waypoints",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Waypoint"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/drone/rtl": {
+            "get": {
+                "description": "Tells Drone to return home and land",
+                "tags": [
+                    "Drone"
+                ],
+                "summary": "Returns to Home and Lands",
+                "responses": {
+                    "200": {
+                        "description": "RTL command issued successfully",
+                        "schema": {
+                            "type": "body"
+                        }
+                    },
+                    "500": {
+                        "description": "RTL command encountered an error",
+                        "schema": {
+                            "type": "body"
+                        }
+                    }
+                }
+            }
+        },
+        "/drone/takeoff": {
+            "post": {
+                "description": "Tells Drone to takeoff",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Drone"
+                ],
+                "summary": "Take off Drone",
+                "parameters": [
+                    {
+                        "description": "Takeoff Altitude",
+                        "name": "altitude",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "number"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/ground_object": {
+            "post": {
+                "description": "Create a singular ground object based on JSON, must have sentinel ID of \"-1\"",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "GroundObject"
+                ],
+                "summary": "Create a ground object",
+                "parameters": [
+                    {
+                        "description": "Ground Object Data",
+                        "name": "object",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.GroundObject"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/responses.GroundObjectResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid JSON or Ground Object Data",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Error Creating Ground Object",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/ground_object/{id}": {
+            "get": {
+                "description": "Get a singular ground object based on the provided ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "GroundObject"
+                ],
+                "summary": "Get a ground object by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Ground Object ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/responses.GroundObjectResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Ground Object Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Error Querying Ground Object",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete a singular payload based on path param",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Payload"
+                ],
+                "summary": "Delete a payload",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Payload ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success (returns a blank Payload)",
+                        "schema": {
+                            "$ref": "#/definitions/responses.PayloadResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Payload Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Error Deleting Payload",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "Edit a singular ground object based on path param and JSON",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "GroundObject"
+                ],
+                "summary": "Edit a ground object.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "GroundObject ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "example": "{\"name\": \"Whiskey\"}",
+                        "description": "JSON fields",
+                        "name": "fields",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/responses.GroundObjectResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid JSON or GroundObject ID",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "GroundObject Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Error Editing GroundObject",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/payload": {
+            "post": {
+                "description": "Create a singular payload based on JSON, must have sentinel ID of \"-1\"",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Payload"
+                ],
+                "summary": "Create a payload",
+                "parameters": [
+                    {
+                        "description": "Payload Data",
+                        "name": "object",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Payload"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/responses.PayloadResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid JSON or Payload Data",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Error Payload",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/payload/{id}": {
+            "get": {
+                "description": "Get a singular payload based on the provided ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Payload"
+                ],
+                "summary": "Get a payload by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Payload ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/responses.PayloadResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Payload Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Error Querying Payload",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "Edit a singular payload based on path param and JSON",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Payload"
+                ],
+                "summary": "Edit a payload.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Payload ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "example": "{\"name\": \"Whiskey\"}",
+                        "description": "JSON fields",
+                        "name": "fields",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/responses.PayloadResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid JSON or Payload ID",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Payload Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Error Editing Payload",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/status": {
             "get": {
                 "description": "Get the current status of the drone",
@@ -316,7 +831,7 @@
                         "required": true
                     },
                     {
-                        "example": "{\"name\": \"Whiskey}",
+                        "example": "{\"name\": \"Whiskey\"}",
                         "description": "JSON fields",
                         "name": "fields",
                         "in": "body",
@@ -546,7 +1061,7 @@
                 "Launch",
                 "Land",
                 "Obstacle",
-                "Payload"
+                "PayloadDesignation"
             ]
         },
         "models.Drone": {
@@ -603,6 +1118,85 @@
                     "type": "number",
                     "x-order": "9",
                     "example": 2.6
+                }
+            }
+        },
+        "models.GroundObject": {
+            "type": "object",
+            "required": [
+                "color",
+                "id",
+                "lat",
+                "long",
+                "obj_type",
+                "shape",
+                "text",
+                "text_color"
+            ],
+            "properties": {
+                "id": {
+                    "description": "To create a ground object, ID of \"-1\" must be passed",
+                    "type": "string",
+                    "x-order": "1",
+                    "example": "-1"
+                },
+                "obj_type": {
+                    "type": "string",
+                    "x-order": "2",
+                    "example": "standard"
+                },
+                "shape": {
+                    "type": "string",
+                    "x-order": "3",
+                    "example": "triangle"
+                },
+                "color": {
+                    "type": "string",
+                    "x-order": "4",
+                    "example": "blue"
+                },
+                "text": {
+                    "type": "string",
+                    "x-order": "5",
+                    "example": "A"
+                },
+                "text_color": {
+                    "type": "string",
+                    "x-order": "6",
+                    "example": "green"
+                },
+                "long": {
+                    "type": "number",
+                    "x-order": "7",
+                    "example": -123.45
+                },
+                "lat": {
+                    "type": "number",
+                    "x-order": "8",
+                    "example": 123.45
+                }
+            }
+        },
+        "models.Payload": {
+            "type": "object",
+            "required": [
+                "ground_object",
+                "id"
+            ],
+            "properties": {
+                "id": {
+                    "description": "To create a payload, ID of \"-1\" must be passed",
+                    "type": "string",
+                    "x-order": "1",
+                    "example": "1"
+                },
+                "ground_object": {
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.GroundObject"
+                        }
+                    ],
+                    "x-order": "2"
                 }
             }
         },
@@ -692,6 +1286,32 @@
                 "message": {
                     "type": "string",
                     "example": "Sample error message"
+                }
+            }
+        },
+        "responses.GroundObjectResponse": {
+            "description": "Describes a response a single ground object",
+            "type": "object",
+            "properties": {
+                "ground_object": {
+                    "$ref": "#/definitions/models.GroundObject"
+                },
+                "message": {
+                    "type": "string",
+                    "example": "Sample success message"
+                }
+            }
+        },
+        "responses.PayloadResponse": {
+            "description": "Describes a response a single payload",
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "Sample success message"
+                },
+                "payload": {
+                    "$ref": "#/definitions/models.Payload"
                 }
             }
         },

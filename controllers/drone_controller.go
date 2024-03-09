@@ -36,6 +36,15 @@ func GetStatusHistory(c echo.Context) error {
 	return c.JSON(http.StatusOK, c.Get("drone"))
 }
 
+// Takeoff tells the drone to take off to a specific altitude
+//
+//	@Summary		Take off Drone
+//	@Description	Tells Drone to takeoff
+//	@Tags			Drone
+//	@Accept			json
+//	@Param			altitude	body	number	true	"Takeoff Altitude"
+//	@Success		200
+//	@Router			/drone/takeoff [post]
 func Takeoff(c echo.Context) error {
 	mp := c.Get("mp").(*configs.MissionPlanner)
 
@@ -52,6 +61,14 @@ func Takeoff(c echo.Context) error {
 	return c.HTML(http.StatusAccepted, "")
 }
 
+// Land tells the drone to land
+//
+//	@Summary		Take off Drone
+//	@Description	Tells Drone to land
+//	@Tags			Drone
+//	@Success		200	body	string	"Command issued successfully"
+//	@Failure		500	body	string	"Command failed to be issued"
+//	@Router			/drone/land [get]
 func Land(c echo.Context) error {
 	mp := c.Get("mp").(*configs.MissionPlanner)
 	if mp.Land() {
@@ -61,6 +78,14 @@ func Land(c echo.Context) error {
 	}
 }
 
+// RTL return to home waypoint and land
+//
+//	@Summary		Returns to Home and Lands
+//	@Description	Tells Drone to return home and land
+//	@Tags			Drone
+//	@Success		200	body	string	"RTL command issued successfully"
+//	@Failure		500	body	string	"RTL command encountered an error"
+//	@Router			/drone/rtl [get]
 func RTL(c echo.Context) error {
 	mp := c.Get("mp").(*configs.MissionPlanner)
 	if mp.ReturnHome() {
@@ -70,6 +95,14 @@ func RTL(c echo.Context) error {
 	}
 }
 
+// Lock locks the drone
+//
+//	@Summary		Halts drone in place while preserving queue
+//	@Description	Stops drone movement while preserving existing queue
+//	@Tags			Drone
+//	@Success		200	body	string	"Drone locked successfully"
+//	@Failure		500	body	string	"Drone unable to lock (already locked?)"
+//	@Router			/drone/lock [get]
 func Lock(c echo.Context) error {
 	mp := c.Get("mp").(*configs.MissionPlanner)
 	if mp.Lock() {
@@ -79,6 +112,14 @@ func Lock(c echo.Context) error {
 	}
 }
 
+// Unlock unlocks the drone
+//
+//	@Summary		Halts drone in place while preserving queue
+//	@Description	Stops drone movement while preserving existing queue
+//	@Tags			Drone
+//	@Success		200	body	string	"Drone unlocked successfully"
+//	@Failure		500	body	string	"Drone unable to unlock (already unlocked?)"
+//	@Router			/drone/lock [get]
 func Unlock(c echo.Context) error {
 	mp := c.Get("mp").(*configs.MissionPlanner)
 	if mp.Unlock() {
@@ -88,12 +129,29 @@ func Unlock(c echo.Context) error {
 	}
 }
 
+// GetQueue obtains the current queue in MissionPlanner
+//
+//	@Summary		Returns queue in Mission Planner
+//	@Description	Returns queue in Mission Planner
+//	@Tags			Drone
+//	@Produce		json
+//	@Success		200	{object}	[]models.Waypoint
+//	@Router			/drone/queue [get]
 func GetQueue(c echo.Context) error {
 	mp := c.Get("mp").(*configs.MissionPlanner)
 	var queue = mp.GetQueue()
 	return c.JSON(http.StatusOK, queue)
 }
 
+// PostQueue sends a queue to MissionPlanner
+//
+//	@Summary		Sends a queue in Mission Planner
+//	@Description	Sends a queue in Mission Planner
+//	@Tags			Drone
+//	@Accept			json
+//	@Param			waypoints	body	[]models.Waypoint	true	"Array of Waypoint Data"
+//	@Success		200
+//	@Router			/drone/queue [post]
 func PostQueue(c echo.Context) error {
 	mp := c.Get("mp").(*configs.MissionPlanner)
 	var queue []models.Waypoint
@@ -118,6 +176,15 @@ func PostQueue(c echo.Context) error {
 	}
 }
 
+// PostHome updates the home waypoint
+//
+//	@Summary		Updates the home waypoint
+//	@Description	Updates the home waypoint
+//	@Tags			Drone
+//	@Accept			json
+//	@Param			waypoints	body	models.Waypoint	true	"Home Waypoint"
+//	@Success		200
+//	@Router			/drone/home [post]
 func PostHome(c echo.Context) error {
 	mp := c.Get("mp").(*configs.MissionPlanner)
 	var wp models.Waypoint
