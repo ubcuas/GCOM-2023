@@ -2,6 +2,7 @@ package configs
 
 import (
 	"net/http"
+	"strconv"
 
 	"bytes"
 	"encoding/json"
@@ -34,7 +35,7 @@ func ConnectMissionPlanner(url string) (*MissionPlanner, error) {
 }
 
 type mpWaypoint struct {
-	ID        int     `json:"id"`
+	ID        string  `json:"id"`
 	Name      string  `json:"name"`
 	Longitude float64 `json:"longitude"`
 	Latitude  float64 `json:"latitude"`
@@ -51,7 +52,6 @@ type mpDrone struct {
 }
 
 func genericGet(url string) *http.Response {
-	println(url)
 	resp, err := http.Get(url)
 	if err != nil {
 		println(url)
@@ -92,7 +92,7 @@ func (mp MissionPlanner) GetQueue() []models.Waypoint {
 
 	for _, mpwp := range respArr {
 		wp := models.Waypoint{
-			ID:        mpwp.ID,
+			ID:        -1,
 			Name:      mpwp.Name,
 			Latitude:  mpwp.Latitude,
 			Longitude: mpwp.Longitude,
@@ -133,9 +133,17 @@ func (mp MissionPlanner) GetStatus() models.Drone {
 	return ans
 }
 
-func (mp MissionPlanner) ReturnHome() bool {
-	resp := genericGet(mp.url + "/rtl")
-	println(resp.StatusCode)
+func (mp MissionPlanner) ReturnHome(alt float64) bool {
+	json, err := json.Marshal(map[string]float64{
+		"altitude": alt,
+	})
+
+	if err != nil {
+		log.Fatal("[MP Functions] Error marshalling altitude for rtl")
+	}
+
+	resp := genericPost(mp.url+"/rtl", json)
+
 	return resp.StatusCode == http.StatusOK
 }
 
@@ -160,7 +168,7 @@ func (mp MissionPlanner) SetQueue(waypoints []models.Waypoint) bool {
 	var mpArr []mpWaypoint
 	for _, wp := range waypoints {
 		mpwp := mpWaypoint{
-			ID:        wp.ID,
+			ID:        strconv.Itoa(wp.ID),
 			Name:      wp.Name,
 			Longitude: wp.Longitude,
 			Latitude:  wp.Latitude,
@@ -196,7 +204,7 @@ func (mp MissionPlanner) Takeoff(alt float64) bool {
 
 func (mp MissionPlanner) SetHome(waypoint models.Waypoint) bool {
 	mpwp := mpWaypoint{
-		ID:        waypoint.ID,
+		ID:        strconv.Itoa(waypoint.ID),
 		Name:      waypoint.Name,
 		Longitude: waypoint.Longitude,
 		Latitude:  waypoint.Latitude,

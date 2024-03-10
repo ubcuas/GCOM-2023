@@ -85,10 +85,20 @@ func Land(c echo.Context) error {
 //	@Tags			Drone
 //	@Success		200	body	string	"RTL command issued successfully"
 //	@Failure		500	body	string	"RTL command encountered an error"
-//	@Router			/drone/rtl [get]
+//	@Router			/drone/rtl [post]
 func RTL(c echo.Context) error {
 	mp := c.Get("mp").(*configs.MissionPlanner)
-	if mp.ReturnHome() {
+
+	var altitude float64
+	json_map := make(map[string]interface{})
+	err := json.NewDecoder(c.Request().Body).Decode(&json_map)
+	if err != nil {
+		return err
+	} else {
+		altitude = json_map["altitude"].(float64)
+	}
+
+	if mp.ReturnHome(altitude) {
 		return c.HTML(http.StatusAccepted, "")
 	} else {
 		return c.HTML(http.StatusInternalServerError, "")
@@ -106,9 +116,9 @@ func RTL(c echo.Context) error {
 func Lock(c echo.Context) error {
 	mp := c.Get("mp").(*configs.MissionPlanner)
 	if mp.Lock() {
-		return c.HTML(http.StatusAccepted, "")
+		return c.HTML(http.StatusAccepted, "a")
 	} else {
-		return c.HTML(http.StatusInternalServerError, "")
+		return c.HTML(http.StatusInternalServerError, "a")
 	}
 }
 

@@ -5,12 +5,10 @@ import (
 	"gcom-backend/controllers"
 	_ "gcom-backend/docs"
 	"gcom-backend/util"
-	"log"
-	"os"
-
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	echoSwagger "github.com/swaggo/echo-swagger"
+	"log"
 )
 
 //	@title			GCOM Backend
@@ -31,7 +29,7 @@ func main() {
 
 	db := configs.Connect(false)
 
-	mp, err := configs.ConnectMissionPlanner(os.Getenv("MP_URL"))
+	mp, err := configs.ConnectMissionPlanner("http://host.docker.internal:9000")
 	if err != nil {
 		log.Fatal("Error connecting to MPS")
 	}
@@ -75,7 +73,7 @@ func main() {
 	e.GET("/status/history", controllers.GetStatusHistory)
 	e.POST("/drone/takeoff", controllers.Takeoff)
 	e.GET("/drone/land", controllers.Land)
-	e.GET("/drone/rtl", controllers.RTL)
+	e.POST("/drone/rtl", controllers.RTL)
 	e.GET("/drone/lock", controllers.Lock)
 	e.GET("/drone/unlock", controllers.Unlock)
 	e.GET("/drone/queue", controllers.GetQueue)
