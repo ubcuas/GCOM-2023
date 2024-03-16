@@ -5,10 +5,11 @@ import (
 	"gcom-backend/controllers"
 	_ "gcom-backend/docs"
 	"gcom-backend/util"
+	"log"
+
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	echoSwagger "github.com/swaggo/echo-swagger"
-	"log"
 )
 
 //	@title			GCOM Backend
@@ -38,6 +39,7 @@ func main() {
 
 	e.Use(util.DBMiddleware(db))
 	e.Use(util.MPMiddleware(mp))
+	e.Use(middleware.CORS())
 	e.Use(middleware.Logger())
 
 	e.GET("/", func(c echo.Context) error {
