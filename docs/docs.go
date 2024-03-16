@@ -25,109 +25,6 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/air_object": {
-            "get": {
-                "description": "Get the status of all current air objects (drones)",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "AirObject"
-                ],
-                "summary": "Get air objects",
-                "responses": {
-                    "200": {
-                        "description": "Success",
-                        "schema": {
-                            "$ref": "#/definitions/responses.AirObjectsResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Objects not found",
-                        "schema": {
-                            "$ref": "#/definitions/responses.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal error querying AirObjects",
-                        "schema": {
-                            "$ref": "#/definitions/responses.ErrorResponse"
-                        }
-                    }
-                }
-            },
-            "post": {
-                "description": "Create multiple AirObjects for remoteID based on JSON array.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "AirObject"
-                ],
-                "summary": "Create multiple AirObjects",
-                "parameters": [
-                    {
-                        "description": "Array of AirObject Data",
-                        "name": "airObjects",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.AirObject"
-                            }
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Success",
-                        "schema": {
-                            "$ref": "#/definitions/responses.AirObjectsResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid JSON or AirObject Data",
-                        "schema": {
-                            "$ref": "#/definitions/responses.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Error Creating AirObjects",
-                        "schema": {
-                            "$ref": "#/definitions/responses.ErrorResponse"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "description": "Delete all AirObjects (remoteID drones)",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "AirObject"
-                ],
-                "summary": "Delete all AirObjects",
-                "responses": {
-                    "200": {
-                        "description": "Success (returns a empty array)",
-                        "schema": {
-                            "$ref": "#/definitions/responses.AirObjectsResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Error Deleting AirObjects",
-                        "schema": {
-                            "$ref": "#/definitions/responses.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
         "/status": {
             "get": {
                 "description": "Get the current status of the drone",
@@ -492,54 +389,6 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "models.AirObject": {
-            "description": "describes the information from remoteID of other present drones.",
-            "type": "object",
-            "required": [
-                "altitude",
-                "heading",
-                "id",
-                "latitude",
-                "longitude",
-                "speed",
-                "timestamp",
-                "v_speed"
-            ],
-            "properties": {
-                "altitude": {
-                    "type": "number",
-                    "example": 75
-                },
-                "heading": {
-                    "type": "number",
-                    "example": 12
-                },
-                "id": {
-                    "type": "string",
-                    "example": "FIN87astrdge12k8"
-                },
-                "latitude": {
-                    "type": "number",
-                    "example": -123.245995
-                },
-                "longitude": {
-                    "type": "number",
-                    "example": 49.260605
-                },
-                "speed": {
-                    "type": "number",
-                    "example": 0.56
-                },
-                "timestamp": {
-                    "type": "integer",
-                    "example": 1700905713
-                },
-                "v_speed": {
-                    "type": "number",
-                    "example": -1.2
-                }
-            }
-        },
         "models.Designation": {
             "description": "Describes a special purpose for a Waypoint",
             "type": "string",
@@ -670,22 +519,6 @@ const docTemplate = `{
                     "type": "string",
                     "x-order": "8",
                     "example": "Task 1 Landing Zone"
-                }
-            }
-        },
-        "responses.AirObjectsResponse": {
-            "description": "Describes a response with multiple waypoints",
-            "type": "object",
-            "properties": {
-                "air_objects": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.AirObject"
-                    }
-                },
-                "message": {
-                    "type": "string",
-                    "example": "Sample success message"
                 }
             }
         },

@@ -26,7 +26,7 @@ import (
 //	@Tags		Waypoints
 
 func main() {
-	db := configs.Connect()
+	db := configs.Connect(false)
 
 	e := echo.New()
 
@@ -49,29 +49,12 @@ func main() {
 	e.DELETE("/waypoints", controllers.DeleteWaypointBatch)
 	e.GET("/waypoints", controllers.GetAllWaypoints)
 
-	//Ground Object
-	e.POST("/ground_object", controllers.CreateGroundObject)
-	e.PATCH("/ground_object/:groundObjectId", controllers.EditGroundObject)
-	e.GET("/ground_object/:groundObjectId", controllers.GetGroundObject)
-	e.DELETE("/ground_object/:groundObjectId", controllers.DeleteGroundObject)
-
-	//Payload
-	e.POST("/payload", controllers.CreatePayload)
-	e.PATCH("/payload:payloadId", controllers.EditPayload)
-	e.GET("/payload:payloadId", controllers.GetPayload)
-	e.DELETE("/payload/:payloadID", controllers.DeletePayload)
-
 	//Drone
 	e.GET("/status", controllers.GetCurrentStatus)
 	e.GET("/status/history", controllers.GetStatusHistory)
 
-	//AirObjects
-	e.GET("/air_object", controllers.GetAirObjects)
-	e.DELETE("/air_object", controllers.DeleteAirObjects)
-	e.POST("/air_object", controllers.CreateAirObjects)
-
 	//Websockets
 	e.Any("/socket.io/", controllers.WebsocketHandler())
 
-	e.Logger.Fatal(e.Start("localhost:1323"))
+	e.Logger.Fatal(e.Start("0.0.0.0:1323"))
 }
