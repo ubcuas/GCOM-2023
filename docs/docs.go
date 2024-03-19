@@ -255,7 +255,7 @@ const docTemplate = `{
             }
         },
         "/drone/rtl": {
-            "get": {
+            "post": {
                 "description": "Tells Drone to return home and land",
                 "tags": [
                     "Drone"
