@@ -1,8 +1,12 @@
 package controllers
 
 import (
+	"gcom-backend/configs"
+	"gcom-backend/responses"
+	"gcom-backend/models"
 	"github.com/labstack/echo/v4"
 	"net/http"
+	"encoding/json"
 )
 
 // GetCurrentStatus gets the current status of the drone

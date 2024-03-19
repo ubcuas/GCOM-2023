@@ -69,11 +69,6 @@ func main() {
 	e.POST("/drone/queue", controllers.PostQueue)
 	e.POST("/drone/home", controllers.PostHome)
 
-	//AirObjects
-	e.GET("/air_object", controllers.GetAirObjects)
-	e.DELETE("/air_object", controllers.DeleteAirObjects)
-	e.POST("/air_object", controllers.CreateAirObjects)
-
 	//Websockets
 	e.Any("/socket.io/", controllers.WebsocketHandler())
 
