@@ -1,43 +1,6 @@
 consumes:
 - application/json
 definitions:
-  models.AirObject:
-    description: describes the information from remoteID of other present drones.
-    properties:
-      altitude:
-        example: 75
-        type: number
-      heading:
-        example: 12
-        type: number
-      id:
-        example: FIN87astrdge12k8
-        type: string
-      latitude:
-        example: -123.245995
-        type: number
-      longitude:
-        example: 49.260605
-        type: number
-      speed:
-        example: 0.56
-        type: number
-      timestamp:
-        example: 1700905713
-        type: integer
-      v_speed:
-        example: -1.2
-        type: number
-    required:
-    - altitude
-    - heading
-    - id
-    - latitude
-    - longitude
-    - speed
-    - timestamp
-    - v_speed
-    type: object
   models.Designation:
     description: Describes a special purpose for a Waypoint
     enum:
@@ -202,17 +165,6 @@ definitions:
     - lat
     - long
     - name
-    type: object
-  responses.AirObjectsResponse:
-    description: Describes a response with multiple waypoints
-    properties:
-      air_objects:
-        items:
-          $ref: '#/definitions/models.AirObject'
-        type: array
-      message:
-        example: Sample success message
-        type: string
     type: object
   responses.ErrorResponse:
     description: JSON response for any error

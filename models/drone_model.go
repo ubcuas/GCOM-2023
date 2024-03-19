@@ -4,7 +4,7 @@ package models
 //
 // @Description describes the drone being flown
 type Drone struct {
-	Timestamp     int64     `json:"timestamp" gorm:"primaryKey" validate:"required" example:"1698544781" extensions:"x-order=1"`
+	Timestamp     int     `json:"timestamp" gorm:"primaryKey" validate:"required" example:"1698544781" extensions:"x-order=1"`
 	Latitude      float64 `json:"lat" validate:"required" example:"49.267941" extensions:"x-order=2"`
 	Longitude     float64 `json:"long" validate:"required" example:"-123.247360" extensions:"x-order=3"`
 	Altitude      float64 `json:"alt" validate:"required" example:"100.00" extensions:"x-order=4"`

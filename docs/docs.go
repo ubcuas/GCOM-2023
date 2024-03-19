@@ -1030,54 +1030,6 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "models.AirObject": {
-            "description": "describes the information from remoteID of other present drones.",
-            "type": "object",
-            "required": [
-                "altitude",
-                "heading",
-                "id",
-                "latitude",
-                "longitude",
-                "speed",
-                "timestamp",
-                "v_speed"
-            ],
-            "properties": {
-                "altitude": {
-                    "type": "number",
-                    "example": 75
-                },
-                "heading": {
-                    "type": "number",
-                    "example": 12
-                },
-                "id": {
-                    "type": "string",
-                    "example": "FIN87astrdge12k8"
-                },
-                "latitude": {
-                    "type": "number",
-                    "example": -123.245995
-                },
-                "longitude": {
-                    "type": "number",
-                    "example": 49.260605
-                },
-                "speed": {
-                    "type": "number",
-                    "example": 0.56
-                },
-                "timestamp": {
-                    "type": "integer",
-                    "example": 1700905713
-                },
-                "v_speed": {
-                    "type": "number",
-                    "example": -1.2
-                }
-            }
-        },
         "models.Designation": {
             "description": "Describes a special purpose for a Waypoint",
             "type": "string",
@@ -1290,22 +1242,6 @@ const docTemplate = `{
                 }
             }
         },
-        "responses.AirObjectsResponse": {
-            "description": "Describes a response with multiple waypoints",
-            "type": "object",
-            "properties": {
-                "air_objects": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.AirObject"
-                    }
-                },
-                "message": {
-                    "type": "string",
-                    "example": "Sample success message"
-                }
-            }
-        },
         "responses.ErrorResponse": {
             "description": "JSON response for any error",
             "type": "object",
@@ -1316,6 +1252,32 @@ const docTemplate = `{
                 "message": {
                     "type": "string",
                     "example": "Sample error message"
+                }
+            }
+        },
+        "responses.GroundObjectResponse": {
+            "description": "Describes a response a single ground object",
+            "type": "object",
+            "properties": {
+                "ground_object": {
+                    "$ref": "#/definitions/models.GroundObject"
+                },
+                "message": {
+                    "type": "string",
+                    "example": "Sample success message"
+                }
+            }
+        },
+        "responses.PayloadResponse": {
+            "description": "Describes a response a single payload",
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "Sample success message"
+                },
+                "payload": {
+                    "$ref": "#/definitions/models.Payload"
                 }
             }
         },

@@ -1,13 +1,8 @@
 package controllers
 
 import (
-	"encoding/json"
-	"gcom-backend/configs"
-	"gcom-backend/models"
-	"gcom-backend/responses"
-	"net/http"
-
 	"github.com/labstack/echo/v4"
+	"net/http"
 )
 
 // GetCurrentStatus gets the current status of the drone
@@ -19,9 +14,7 @@ import (
 //	@Success		200	{object}	models.Drone	"Success"
 //	@Router			/status [get]
 func GetCurrentStatus(c echo.Context) error {
-	mp := c.Get("mp").(*configs.MissionPlanner)
-	drone := mp.GetStatus()
-	return c.JSON(http.StatusOK, drone)
+	return c.JSON(http.StatusOK, c.Get("drone"))
 }
 
 // GetStatusHistory gets the status of the drone for the last 5 minutes
