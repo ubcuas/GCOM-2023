@@ -5,6 +5,7 @@ import (
 	"gcom-backend/controllers"
 	_ "gcom-backend/docs"
 	"gcom-backend/util"
+	"log"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -28,9 +29,16 @@ import (
 func main() {
 	db := configs.Connect(false)
 
+	mp, err := configs.ConnectMissionPlanner("http://host.docker.internal:9000")
+	if err != nil {
+		log.Fatal("Error connecting to MPS")
+	}
+
 	e := echo.New()
 
 	e.Use(util.DBMiddleware(db))
+	e.Use(util.MPMiddleware(mp))
+	e.Use(middleware.CORS())
 	e.Use(middleware.Logger())
 
 	e.GET("/", func(c echo.Context) error {
@@ -52,6 +60,14 @@ func main() {
 	//Drone
 	e.GET("/status", controllers.GetCurrentStatus)
 	e.GET("/status/history", controllers.GetStatusHistory)
+	e.POST("/drone/takeoff", controllers.Takeoff)
+	e.GET("/drone/land", controllers.Land)
+	e.POST("/drone/rtl", controllers.RTL)
+	e.GET("/drone/lock", controllers.Lock)
+	e.GET("/drone/unlock", controllers.Unlock)
+	e.GET("/drone/queue", controllers.GetQueue)
+	e.POST("/drone/queue", controllers.PostQueue)
+	e.POST("/drone/home", controllers.PostHome)
 
 	//Websockets
 	e.Any("/socket.io/", controllers.WebsocketHandler())
