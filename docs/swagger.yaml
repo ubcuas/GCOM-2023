@@ -13,7 +13,7 @@ definitions:
     - Launch
     - Land
     - Obstacle
-    - PayloadDesignation
+    - Payload
   models.Drone:
     description: describes the drone being flown
     properties:
@@ -59,66 +59,6 @@ definitions:
     - speed
     - timestamp
     - v_speed
-    type: object
-  models.GroundObject:
-    properties:
-      color:
-        example: blue
-        type: string
-        x-order: "4"
-      id:
-        description: To create a ground object, ID of "-1" must be passed
-        example: "-1"
-        type: string
-        x-order: "1"
-      lat:
-        example: 123.45
-        type: number
-        x-order: "8"
-      long:
-        example: -123.45
-        type: number
-        x-order: "7"
-      obj_type:
-        example: standard
-        type: string
-        x-order: "2"
-      shape:
-        example: triangle
-        type: string
-        x-order: "3"
-      text:
-        example: A
-        type: string
-        x-order: "5"
-      text_color:
-        example: green
-        type: string
-        x-order: "6"
-    required:
-    - color
-    - id
-    - lat
-    - long
-    - obj_type
-    - shape
-    - text
-    - text_color
-    type: object
-  models.Payload:
-    properties:
-      ground_object:
-        allOf:
-        - $ref: '#/definitions/models.GroundObject'
-        x-order: "2"
-      id:
-        description: To create a payload, ID of "-1" must be passed
-        example: "1"
-        type: string
-        x-order: "1"
-    required:
-    - ground_object
-    - id
     type: object
   models.Waypoint:
     description: describes a location in GCOM
@@ -175,35 +115,7 @@ definitions:
         example: Sample error message
         type: string
     type: object
-  responses.GroundObjectResponse:
-    description: Describes a response a single ground object
-    properties:
-      ground_object:
-        $ref: '#/definitions/models.GroundObject'
-      message:
-        example: Sample success message
-        type: string
-    type: object
-  responses.PayloadResponse:
-    description: Describes a response a single payload
-    properties:
-      message:
-        example: Sample success message
-        type: string
-      payload:
-        $ref: '#/definitions/models.Payload'
-    type: object
-  responses.WaypointResponse:
-    description: Describes a response a single waypoint
-    properties:
-      message:
-        example: Sample success message
-        type: string
-      waypoint:
-        $ref: '#/definitions/models.Waypoint'
-    type: object
-  responses.WaypointsResponse:
-    description: Describes a response with multiple waypoints
+  responses.MultipleResponse-models_Waypoint:
     properties:
       message:
         example: Sample success message
@@ -212,6 +124,14 @@ definitions:
         items:
           $ref: '#/definitions/models.Waypoint'
         type: array
+    type: object
+  responses.SingleResponse-models_Waypoint:
+    properties:
+      message:
+        example: Sample success message
+        type: string
+      waypoint:
+        $ref: '#/definitions/models.Waypoint'
     type: object
 host: localhost:1323
 info:
@@ -223,74 +143,6 @@ info:
   title: GCOM Backend
   version: "1.0"
 paths:
-  /air_object:
-    delete:
-      description: Delete all AirObjects (remoteID drones)
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Success (returns a empty array)
-          schema:
-            $ref: '#/definitions/responses.AirObjectsResponse'
-        "500":
-          description: Internal Error Deleting AirObjects
-          schema:
-            $ref: '#/definitions/responses.ErrorResponse'
-      summary: Delete all AirObjects
-      tags:
-      - AirObject
-    get:
-      description: Get the status of all current air objects (drones)
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Success
-          schema:
-            $ref: '#/definitions/responses.AirObjectsResponse'
-        "404":
-          description: Objects not found
-          schema:
-            $ref: '#/definitions/responses.ErrorResponse'
-        "500":
-          description: Internal error querying AirObjects
-          schema:
-            $ref: '#/definitions/responses.ErrorResponse'
-      summary: Get air objects
-      tags:
-      - AirObject
-    post:
-      consumes:
-      - application/json
-      description: Create multiple AirObjects for remoteID based on JSON array.
-      parameters:
-      - description: Array of AirObject Data
-        in: body
-        name: airObjects
-        required: true
-        schema:
-          items:
-            $ref: '#/definitions/models.AirObject'
-          type: array
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Success
-          schema:
-            $ref: '#/definitions/responses.AirObjectsResponse'
-        "400":
-          description: Invalid JSON or AirObject Data
-          schema:
-            $ref: '#/definitions/responses.ErrorResponse'
-        "500":
-          description: Internal Error Creating AirObjects
-          schema:
-            $ref: '#/definitions/responses.ErrorResponse'
-      summary: Create multiple AirObjects
-      tags:
-      - AirObject
   /drone/home:
     post:
       consumes:
@@ -421,232 +273,6 @@ paths:
       summary: Halts drone in place while preserving queue
       tags:
       - Drone
-  /ground_object:
-    post:
-      consumes:
-      - application/json
-      description: Create a singular ground object based on JSON, must have sentinel
-        ID of "-1"
-      parameters:
-      - description: Ground Object Data
-        in: body
-        name: object
-        required: true
-        schema:
-          $ref: '#/definitions/models.GroundObject'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Success
-          schema:
-            $ref: '#/definitions/responses.GroundObjectResponse'
-        "400":
-          description: Invalid JSON or Ground Object Data
-          schema:
-            $ref: '#/definitions/responses.ErrorResponse'
-        "500":
-          description: Internal Error Creating Ground Object
-          schema:
-            $ref: '#/definitions/responses.ErrorResponse'
-      summary: Create a ground object
-      tags:
-      - GroundObject
-  /ground_object/{id}:
-    delete:
-      consumes:
-      - application/json
-      description: Delete a singular payload based on path param
-      parameters:
-      - description: Payload ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Success (returns a blank Payload)
-          schema:
-            $ref: '#/definitions/responses.PayloadResponse'
-        "404":
-          description: Payload Not Found
-          schema:
-            $ref: '#/definitions/responses.ErrorResponse'
-        "500":
-          description: Internal Error Deleting Payload
-          schema:
-            $ref: '#/definitions/responses.ErrorResponse'
-      summary: Delete a payload
-      tags:
-      - Payload
-    get:
-      consumes:
-      - application/json
-      description: Get a singular ground object based on the provided ID
-      parameters:
-      - description: Ground Object ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Success
-          schema:
-            $ref: '#/definitions/responses.GroundObjectResponse'
-        "404":
-          description: Ground Object Not Found
-          schema:
-            $ref: '#/definitions/responses.ErrorResponse'
-        "500":
-          description: Internal Error Querying Ground Object
-          schema:
-            $ref: '#/definitions/responses.ErrorResponse'
-      summary: Get a ground object by ID
-      tags:
-      - GroundObject
-    patch:
-      consumes:
-      - application/json
-      description: Edit a singular ground object based on path param and JSON
-      parameters:
-      - description: GroundObject ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      - description: JSON fields
-        example: '{"name": "Whiskey"}'
-        in: body
-        name: fields
-        required: true
-        schema:
-          type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Success
-          schema:
-            $ref: '#/definitions/responses.GroundObjectResponse'
-        "400":
-          description: Invalid JSON or GroundObject ID
-          schema:
-            $ref: '#/definitions/responses.ErrorResponse'
-        "404":
-          description: GroundObject Not Found
-          schema:
-            $ref: '#/definitions/responses.ErrorResponse'
-        "500":
-          description: Internal Error Editing GroundObject
-          schema:
-            $ref: '#/definitions/responses.ErrorResponse'
-      summary: Edit a ground object.
-      tags:
-      - GroundObject
-  /payload:
-    post:
-      consumes:
-      - application/json
-      description: Create a singular payload based on JSON, must have sentinel ID
-        of "-1"
-      parameters:
-      - description: Payload Data
-        in: body
-        name: object
-        required: true
-        schema:
-          $ref: '#/definitions/models.Payload'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Success
-          schema:
-            $ref: '#/definitions/responses.PayloadResponse'
-        "400":
-          description: Invalid JSON or Payload Data
-          schema:
-            $ref: '#/definitions/responses.ErrorResponse'
-        "500":
-          description: Internal Error Payload
-          schema:
-            $ref: '#/definitions/responses.ErrorResponse'
-      summary: Create a payload
-      tags:
-      - Payload
-  /payload/{id}:
-    get:
-      consumes:
-      - application/json
-      description: Get a singular payload based on the provided ID
-      parameters:
-      - description: Payload ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Success
-          schema:
-            $ref: '#/definitions/responses.PayloadResponse'
-        "404":
-          description: Payload Not Found
-          schema:
-            $ref: '#/definitions/responses.ErrorResponse'
-        "500":
-          description: Internal Error Querying Payload
-          schema:
-            $ref: '#/definitions/responses.ErrorResponse'
-      summary: Get a payload by ID
-      tags:
-      - Payload
-    patch:
-      consumes:
-      - application/json
-      description: Edit a singular payload based on path param and JSON
-      parameters:
-      - description: Payload ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      - description: JSON fields
-        example: '{"name": "Whiskey"}'
-        in: body
-        name: fields
-        required: true
-        schema:
-          type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Success
-          schema:
-            $ref: '#/definitions/responses.PayloadResponse'
-        "400":
-          description: Invalid JSON or Payload ID
-          schema:
-            $ref: '#/definitions/responses.ErrorResponse'
-        "404":
-          description: Payload Not Found
-          schema:
-            $ref: '#/definitions/responses.ErrorResponse'
-        "500":
-          description: Internal Error Editing Payload
-          schema:
-            $ref: '#/definitions/responses.ErrorResponse'
-      summary: Edit a payload.
-      tags:
-      - Payload
   /status:
     get:
       description: Get the current status of the drone
@@ -694,7 +320,7 @@ paths:
         "200":
           description: Success
           schema:
-            $ref: '#/definitions/responses.WaypointResponse'
+            $ref: '#/definitions/responses.SingleResponse-models_Waypoint'
         "400":
           description: Invalid JSON or Waypoint Data
           schema:
@@ -723,7 +349,7 @@ paths:
         "200":
           description: Success (returns a blank Waypoint)
           schema:
-            $ref: '#/definitions/responses.WaypointResponse'
+            $ref: '#/definitions/responses.SingleResponse-models_Waypoint'
         "404":
           description: Waypoint Not Found
           schema:
@@ -751,7 +377,7 @@ paths:
         "200":
           description: Success
           schema:
-            $ref: '#/definitions/responses.WaypointResponse'
+            $ref: '#/definitions/responses.SingleResponse-models_Waypoint'
         "404":
           description: Waypoint Not Found
           schema:
@@ -774,7 +400,7 @@ paths:
         required: true
         type: integer
       - description: JSON fields
-        example: '{"name": "Whiskey"}'
+        example: '{"name": "Whiskey}'
         in: body
         name: fields
         required: true
@@ -786,7 +412,7 @@ paths:
         "200":
           description: Success
           schema:
-            $ref: '#/definitions/responses.WaypointResponse'
+            $ref: '#/definitions/responses.SingleResponse-models_Waypoint'
         "400":
           description: Invalid JSON or Waypoint ID
           schema:
@@ -822,7 +448,7 @@ paths:
         "200":
           description: Success (returns a blank Waypoint)
           schema:
-            $ref: '#/definitions/responses.WaypointResponse'
+            $ref: '#/definitions/responses.SingleResponse-models_Waypoint'
         "400":
           description: Invalid JSON or Waypoint IDs
           schema:
@@ -848,7 +474,7 @@ paths:
         "200":
           description: Success
           schema:
-            $ref: '#/definitions/responses.WaypointsResponse'
+            $ref: '#/definitions/responses.MultipleResponse-models_Waypoint'
         "500":
           description: Internal Error Querying Waypoints
           schema:
@@ -876,7 +502,7 @@ paths:
         "200":
           description: Success
           schema:
-            $ref: '#/definitions/responses.WaypointsResponse'
+            $ref: '#/definitions/responses.MultipleResponse-models_Waypoint'
         "400":
           description: Invalid JSON or Waypoint Data
           schema:
