@@ -10,11 +10,14 @@ To build a binary, run:
 
 The project is hosted at `localhost:1323`
 
-We highly recommend testing endpoints using the Insomnia Client and will be sharing testing endpoints there as well. To join the organization, message the channel on Discord with the email you signed up for Insomnia with.
+Compiled Docker Images are also availble as `ubcuas/gcom-2023-backend`
+To run GCOM-2023 using a docker image, ensure you have docker install and run
+`docker pull ubcuas/gcom-2023-backend:latest`
+`docker run -it --rm -p 1323:1323 ubcuas/gcom-2023-backend:latest`
 
 ## Accessing the Docs
 To access the automatically generated documentation for the API,
-navigate to the [Swagger Docs](localhost:1323/swagger/index.html)
+navigate to the Swagger Docs at `localhost:1323/swagger//index.html`
 
 ## Major Dependencies
 
