@@ -69,6 +69,15 @@ func main() {
 	e.POST("/drone/queue", controllers.PostQueue)
 	e.POST("/drone/home", controllers.PostHome)
 
+	//Ground Objects
+	e.POST("/groundobject", controllers.CreateGroundObject)
+	e.POST("/groundobjects", controllers.CreateGroundObjectBatch)
+	e.PATCH("/groundobject/:objectId", controllers.EditGroundObject)
+	e.GET("/groundobject/:objectId", controllers.GetGroundObject)
+	e.DELETE("/groundobject/:objectId", controllers.DeleteGroundObject)
+	e.DELETE("/groundobjects", controllers.DeleteGroundObjectBatch)
+	e.GET("/groundobjects", controllers.GetAllGroundObjects)
+
 	//Websockets
 	e.Any("/socket.io/", controllers.WebsocketHandler())
 

@@ -218,6 +218,325 @@
                 }
             }
         },
+        "/groundobject": {
+            "post": {
+                "description": "Create a singular ground object based on JSON, must have sentinel ID of \"-1\"",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "GroundObject"
+                ],
+                "summary": "Create a ground object",
+                "parameters": [
+                    {
+                        "description": "Ground Object Data",
+                        "name": "object",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.GroundObject"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/responses.SingleResponse-models_GroundObject"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid JSON or Object Data",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Error Creating GroundObject",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete multiple ground objects based on json body",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "GroundObject"
+                ],
+                "summary": "Delete multiple ground objects",
+                "parameters": [
+                    {
+                        "description": "Ground Object IDs",
+                        "name": "ids",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "integer"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success (returns a blank GroundObject)",
+                        "schema": {
+                            "$ref": "#/definitions/responses.SingleResponse-models_GroundObject"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid JSON or object IDs",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Objects Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Error Deleting Objects",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/groundobject/{id}": {
+            "get": {
+                "description": "Get a singular ground object based on path param",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "GroundObject"
+                ],
+                "summary": "Get a ground object",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Ground Object ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/responses.SingleResponse-models_GroundObject"
+                        }
+                    },
+                    "404": {
+                        "description": "Object Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Error Querying GroundObject",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete a singular ground object based on path param",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "GroundObject"
+                ],
+                "summary": "Delete a ground object",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "GroundObject ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success (returns a blank GroundObject)",
+                        "schema": {
+                            "$ref": "#/definitions/responses.SingleResponse-models_GroundObject"
+                        }
+                    },
+                    "404": {
+                        "description": "GroundObject Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Error Deleting GroundObject",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "Edit a singular object based on path param and JSON",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "GroundObject"
+                ],
+                "summary": "Edit a ground object",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "GroundObject ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "example": "{\"color\": \"black\"}",
+                        "description": "JSON fields",
+                        "name": "fields",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/responses.SingleResponse-models_GroundObject"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid JSON or GroundObject ID",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "GroundObject Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Error Editing GroundObject",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/groundobjects": {
+            "get": {
+                "description": "Get all ground objects in the database",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "GroundObject"
+                ],
+                "summary": "Get all ground objects",
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/responses.MultipleResponse-models_GroundObject"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Error Querying GroundObjects",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create multiple ground objects based on JSON, all must have sentinel ID of \"-1\"",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "GroundObject"
+                ],
+                "summary": "Create multiple ground objects",
+                "parameters": [
+                    {
+                        "description": "Array of object Data",
+                        "name": "objects",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.GroundObject"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/responses.MultipleResponse-models_GroundObject"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid JSON or object Data",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Error Creating GroundObject",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/status": {
             "get": {
                 "description": "Get the current status of the drone",
@@ -655,6 +974,65 @@
                 }
             }
         },
+        "models.GroundObject": {
+            "description": "describes targets in GCOM",
+            "type": "object",
+            "required": [
+                "id",
+                "lat",
+                "long",
+                "object_type"
+            ],
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "x-order": "1",
+                    "example": "1"
+                },
+                "object_type": {
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.ObjectType"
+                        }
+                    ],
+                    "x-order": "2",
+                    "example": "emergent"
+                },
+                "lat": {
+                    "type": "number",
+                    "x-order": "3",
+                    "example": 49.267941
+                },
+                "long": {
+                    "type": "number",
+                    "x-order": "4",
+                    "example": -123.24736
+                },
+                "color": {
+                    "type": "string"
+                },
+                "shape": {
+                    "type": "string"
+                },
+                "text": {
+                    "type": "string"
+                },
+                "textColor": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.ObjectType": {
+            "type": "string",
+            "enum": [
+                "standard",
+                "emergent"
+            ],
+            "x-enum-varnames": [
+                "Standard",
+                "Emergent"
+            ]
+        },
         "models.Waypoint": {
             "description": "describes a location in GCOM",
             "type": "object",
@@ -728,6 +1106,21 @@
                 }
             }
         },
+        "responses.MultipleResponse-models_GroundObject": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "Sample success message"
+                },
+                "waypoints": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.GroundObject"
+                    }
+                }
+            }
+        },
         "responses.MultipleResponse-models_Waypoint": {
             "type": "object",
             "properties": {
@@ -740,6 +1133,18 @@
                     "items": {
                         "$ref": "#/definitions/models.Waypoint"
                     }
+                }
+            }
+        },
+        "responses.SingleResponse-models_GroundObject": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "Sample success message"
+                },
+                "waypoint": {
+                    "$ref": "#/definitions/models.GroundObject"
                 }
             }
         },

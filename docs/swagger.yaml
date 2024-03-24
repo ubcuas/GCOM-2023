@@ -60,6 +60,48 @@ definitions:
     - timestamp
     - v_speed
     type: object
+  models.GroundObject:
+    description: describes targets in GCOM
+    properties:
+      color:
+        type: string
+      id:
+        example: "1"
+        type: string
+        x-order: "1"
+      lat:
+        example: 49.267941
+        type: number
+        x-order: "3"
+      long:
+        example: -123.24736
+        type: number
+        x-order: "4"
+      object_type:
+        allOf:
+        - $ref: '#/definitions/models.ObjectType'
+        example: emergent
+        x-order: "2"
+      shape:
+        type: string
+      text:
+        type: string
+      textColor:
+        type: string
+    required:
+    - id
+    - lat
+    - long
+    - object_type
+    type: object
+  models.ObjectType:
+    enum:
+    - standard
+    - emergent
+    type: string
+    x-enum-varnames:
+    - Standard
+    - Emergent
   models.Waypoint:
     description: describes a location in GCOM
     properties:
@@ -115,6 +157,16 @@ definitions:
         example: Sample error message
         type: string
     type: object
+  responses.MultipleResponse-models_GroundObject:
+    properties:
+      message:
+        example: Sample success message
+        type: string
+      waypoints:
+        items:
+          $ref: '#/definitions/models.GroundObject'
+        type: array
+    type: object
   responses.MultipleResponse-models_Waypoint:
     properties:
       message:
@@ -124,6 +176,14 @@ definitions:
         items:
           $ref: '#/definitions/models.Waypoint'
         type: array
+    type: object
+  responses.SingleResponse-models_GroundObject:
+    properties:
+      message:
+        example: Sample success message
+        type: string
+      waypoint:
+        $ref: '#/definitions/models.GroundObject'
     type: object
   responses.SingleResponse-models_Waypoint:
     properties:
@@ -273,6 +333,219 @@ paths:
       summary: Halts drone in place while preserving queue
       tags:
       - Drone
+  /groundobject:
+    delete:
+      consumes:
+      - application/json
+      description: Delete multiple ground objects based on json body
+      parameters:
+      - description: Ground Object IDs
+        in: body
+        name: ids
+        required: true
+        schema:
+          items:
+            type: integer
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success (returns a blank GroundObject)
+          schema:
+            $ref: '#/definitions/responses.SingleResponse-models_GroundObject'
+        "400":
+          description: Invalid JSON or object IDs
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "404":
+          description: Objects Not Found
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "500":
+          description: Internal Error Deleting Objects
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      summary: Delete multiple ground objects
+      tags:
+      - GroundObject
+    post:
+      consumes:
+      - application/json
+      description: Create a singular ground object based on JSON, must have sentinel
+        ID of "-1"
+      parameters:
+      - description: Ground Object Data
+        in: body
+        name: object
+        required: true
+        schema:
+          $ref: '#/definitions/models.GroundObject'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/responses.SingleResponse-models_GroundObject'
+        "400":
+          description: Invalid JSON or Object Data
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "500":
+          description: Internal Error Creating GroundObject
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      summary: Create a ground object
+      tags:
+      - GroundObject
+  /groundobject/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a singular ground object based on path param
+      parameters:
+      - description: GroundObject ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success (returns a blank GroundObject)
+          schema:
+            $ref: '#/definitions/responses.SingleResponse-models_GroundObject'
+        "404":
+          description: GroundObject Not Found
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "500":
+          description: Internal Error Deleting GroundObject
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      summary: Delete a ground object
+      tags:
+      - GroundObject
+    get:
+      consumes:
+      - application/json
+      description: Get a singular ground object based on path param
+      parameters:
+      - description: Ground Object ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/responses.SingleResponse-models_GroundObject'
+        "404":
+          description: Object Not Found
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "500":
+          description: Internal Error Querying GroundObject
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      summary: Get a ground object
+      tags:
+      - GroundObject
+    patch:
+      consumes:
+      - application/json
+      description: Edit a singular object based on path param and JSON
+      parameters:
+      - description: GroundObject ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: JSON fields
+        example: '{"color": "black"}'
+        in: body
+        name: fields
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/responses.SingleResponse-models_GroundObject'
+        "400":
+          description: Invalid JSON or GroundObject ID
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "404":
+          description: GroundObject Not Found
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "500":
+          description: Internal Error Editing GroundObject
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      summary: Edit a ground object
+      tags:
+      - GroundObject
+  /groundobjects:
+    get:
+      consumes:
+      - application/json
+      description: Get all ground objects in the database
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/responses.MultipleResponse-models_GroundObject'
+        "500":
+          description: Internal Error Querying GroundObjects
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      summary: Get all ground objects
+      tags:
+      - GroundObject
+    post:
+      consumes:
+      - application/json
+      description: Create multiple ground objects based on JSON, all must have sentinel
+        ID of "-1"
+      parameters:
+      - description: Array of object Data
+        in: body
+        name: objects
+        required: true
+        schema:
+          items:
+            $ref: '#/definitions/models.GroundObject'
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/responses.MultipleResponse-models_GroundObject'
+        "400":
+          description: Invalid JSON or object Data
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "500":
+          description: Internal Error Creating GroundObject
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      summary: Create multiple ground objects
+      tags:
+      - GroundObject
   /status:
     get:
       description: Get the current status of the drone
