@@ -35,6 +35,7 @@ func main() {
 	}
 
 	e := echo.New()
+	e.Use(middleware.CORS())
 
 	e.Use(util.DBMiddleware(db))
 	e.Use(util.MPMiddleware(mp))
