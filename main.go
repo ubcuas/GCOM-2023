@@ -69,6 +69,7 @@ func main() {
 	e.GET("/drone/queue", controllers.GetQueue)
 	e.POST("/drone/queue", controllers.PostQueue)
 	e.POST("/drone/home", controllers.PostHome)
+	e.POST("/drone/arm", controllers.Arm)
 
 	//Websockets
 	e.Any("/socket.io/", controllers.WebsocketHandler())

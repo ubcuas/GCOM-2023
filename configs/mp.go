@@ -202,6 +202,20 @@ func (mp MissionPlanner) Takeoff(alt float64) bool {
 	return resp.StatusCode == http.StatusOK
 }
 
+func (mp MissionPlanner) Arm(arm int) bool {
+	json, err := json.Marshal(map[string]int{
+		"arm": arm,
+	})
+
+	if err != nil {
+		log.Fatal("[MP Functions] Error marshalling arm")
+	}
+
+	resp := genericPost(mp.url+"/arm", json)
+
+	return resp.StatusCode == http.StatusOK
+}
+
 func (mp MissionPlanner) SetHome(waypoint models.Waypoint) bool {
 	mpwp := mpWaypoint{
 		ID:        strconv.Itoa(waypoint.ID),
