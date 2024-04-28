@@ -58,6 +58,30 @@ func Takeoff(c echo.Context) error {
 	return c.HTML(http.StatusAccepted, "")
 }
 
+// Arm arms the drone 
+//
+//	@Summary		Arm drone
+//	@Description	Arms the drone after takeoff request
+//	@Tags			Drone
+//	@Produce		json
+//	@Success		200	{object}	models.Drone	"Success"
+//	@Router			/status [get]
+func Arm(c echo.Context) error {
+	mp := c.Get("mp").(*configs.MissionPlanner)
+
+	var arm float64
+	json_map := make(map[string]interface{})
+	err := json.NewDecoder(c.Request().Body).Decode(&json_map)
+	if err != nil {
+		return err
+	} else {
+		arm = json_map["arm"].(float64)
+	}
+
+	mp.Arm(int(arm))
+	return c.HTML(http.StatusAccepted, "")
+}
+
 // Land tells the drone to land
 //
 //	@Summary		Take off Drone

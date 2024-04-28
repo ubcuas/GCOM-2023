@@ -35,6 +35,7 @@ func main() {
 	}
 
 	e := echo.New()
+	e.Use(middleware.CORS())
 
 	e.Use(util.DBMiddleware(db))
 	e.Use(util.MPMiddleware(mp))
@@ -68,6 +69,7 @@ func main() {
 	e.GET("/drone/queue", controllers.GetQueue)
 	e.POST("/drone/queue", controllers.PostQueue)
 	e.POST("/drone/home", controllers.PostHome)
+	e.POST("/drone/arm", controllers.Arm)
 
 	//Ground Objects
 	e.POST("/groundobject", controllers.CreateGroundObject)
