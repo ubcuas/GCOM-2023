@@ -40,7 +40,9 @@ func main() {
 	e.Use(util.DBMiddleware(db))
 	e.Use(util.MPMiddleware(mp))
 	e.Use(middleware.CORS())
-	e.Use(middleware.Logger())
+	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
+		Format: "${time_rfc3339} method=${method} uri=${uri} status=${status} ping=${latency_human}\n",
+	}))
 
 	e.GET("/", func(c echo.Context) error {
 		return c.JSON(200, "Hello, World!")
