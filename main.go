@@ -1,11 +1,13 @@
 package main
 
 import (
+	"fmt"
 	"gcom-backend/configs"
 	"gcom-backend/controllers"
 	_ "gcom-backend/docs"
 	"gcom-backend/util"
 	"log"
+	"os"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -28,6 +30,12 @@ import (
 
 func main() {
 	db := configs.Connect(false)
+	err := os.MkdirAll("db", 0755)  //Create db dir
+	err = os.MkdirAll("imgs", 0755) //Create images dir
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 
 	mp, err := configs.ConnectMissionPlanner("http://host.docker.internal:9000")
 	if err != nil {
@@ -79,6 +87,12 @@ func main() {
 	e.DELETE("/groundobject/:objectId", controllers.DeleteGroundObject)
 	e.DELETE("/groundobjects", controllers.DeleteGroundObjectBatch)
 	e.GET("/groundobjects", controllers.GetAllGroundObjects)
+
+	//Image Handling
+	e.POST("/image", controllers.UploadImage)
+	e.GET("/image/list", controllers.ListImages)
+	e.GET("/image/:filename", controllers.GetImage)
+	e.GET("/image/:filename/details", controllers.GetImageDetails)
 
 	//Websockets
 	e.Any("/socket.io/", controllers.WebsocketHandler())
