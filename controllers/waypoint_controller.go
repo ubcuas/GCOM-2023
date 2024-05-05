@@ -24,10 +24,10 @@ var validate = validator.New()
 //	@Tags			Waypoint
 //	@Accept			json
 //	@Produce		json
-//	@Param			waypoint	body		models.Waypoint				true	"Waypoint Data"
-//	@Success		200			{object}	responses.WaypointResponse	"Success"
-//	@Failure		400			{object}	responses.ErrorResponse		"Invalid JSON or Waypoint Data"
-//	@Failure		500			{object}	responses.ErrorResponse		"Internal Error Creating Waypoint"
+//	@Param			waypoint	body		models.Waypoint								true	"Waypoint Data"
+//	@Success		200			{object}	responses.SingleResponse[models.Waypoint]	"Success"
+//	@Failure		400			{object}	responses.ErrorResponse						"Invalid JSON or Waypoint Data"
+//	@Failure		500			{object}	responses.ErrorResponse						"Internal Error Creating Waypoint"
 //	@Router			/waypoint [post]
 func CreateWaypoint(c echo.Context) error {
 	var waypoint models.Waypoint    //Declares an empty Waypoint class
@@ -73,9 +73,9 @@ func CreateWaypoint(c echo.Context) error {
 			Message: "An error occurred creating the waypoint"})
 	}
 
-	return c.JSON(http.StatusOK, responses.WaypointResponse{
+	return c.JSON(http.StatusOK, responses.SingleResponse[models.Waypoint]{
 		Message:  "Waypoint created!",
-		Waypoint: waypoint})
+		Model: waypoint})
 }
 
 // CreateWaypointBatch creates multiple waypoints
@@ -85,10 +85,10 @@ func CreateWaypoint(c echo.Context) error {
 //	@Tags			Waypoint
 //	@Accept			json
 //	@Produce		json
-//	@Param			waypoints	body		[]models.Waypoint			true	"Array of Waypoint Data"
-//	@Success		200			{object}	responses.WaypointsResponse	"Success"
-//	@Failure		400			{object}	responses.ErrorResponse		"Invalid JSON or Waypoint Data"
-//	@Failure		500			{object}	responses.ErrorResponse		"Internal Error Creating Waypoint"
+//	@Param			waypoints	body		[]models.Waypoint							true	"Array of Waypoint Data"
+//	@Success		200			{object}	responses.MultipleResponse[models.Waypoint]	"Success"
+//	@Failure		400			{object}	responses.ErrorResponse						"Invalid JSON or Waypoint Data"
+//	@Failure		500			{object}	responses.ErrorResponse						"Internal Error Creating Waypoint"
 //	@Router			/waypoints [post]
 func CreateWaypointBatch(c echo.Context) error {
 	var waypoints []models.Waypoint
@@ -120,9 +120,9 @@ func CreateWaypointBatch(c echo.Context) error {
 			Message: "An error occurred creating the waypoints"})
 	}
 
-	return c.JSON(http.StatusOK, responses.WaypointsResponse{
+	return c.JSON(http.StatusOK, responses.MultipleResponse[models.Waypoint]{
 		Message:   "Waypoints created!",
-		Waypoints: waypoints})
+		Models: waypoints})
 }
 
 // EditWaypoint edits a waypoint
@@ -132,12 +132,12 @@ func CreateWaypointBatch(c echo.Context) error {
 //	@Tags			Waypoint
 //	@Accept			json
 //	@Produce		json
-//	@Param			id		path		int							true	"Waypoint ID"
-//	@Param			fields	body		string						true	"JSON fields"	example({"name": "Whiskey})
-//	@Success		200		{object}	responses.WaypointResponse	"Success"
-//	@Failure		400		{object}	responses.ErrorResponse		"Invalid JSON or Waypoint ID"
-//	@Failure		404		{object}	responses.ErrorResponse		"Waypoint Not Found"
-//	@Failure		500		{object}	responses.ErrorResponse		"Internal Error Editing Waypoint"
+//	@Param			id		path		int											true	"Waypoint ID"
+//	@Param			fields	body		string										true	"JSON fields"	example({"name": "Whiskey})
+//	@Success		200		{object}	responses.SingleResponse[models.Waypoint]	"Success"
+//	@Failure		400		{object}	responses.ErrorResponse						"Invalid JSON or Waypoint ID"
+//	@Failure		404		{object}	responses.ErrorResponse						"Waypoint Not Found"
+//	@Failure		500		{object}	responses.ErrorResponse						"Internal Error Editing Waypoint"
 //	@Router			/waypoint/{id} [patch]
 func EditWaypoint(c echo.Context) error {
 	/*
@@ -198,9 +198,9 @@ func EditWaypoint(c echo.Context) error {
 	var updatedWaypoint models.Waypoint
 	db.First(&updatedWaypoint, waypointId)
 
-	return c.JSON(http.StatusOK, responses.WaypointResponse{
+	return c.JSON(http.StatusOK, responses.SingleResponse[models.Waypoint]{
 		Message:  "Waypoint updated!",
-		Waypoint: updatedWaypoint,
+		Model: updatedWaypoint,
 	})
 }
 
@@ -211,10 +211,10 @@ func EditWaypoint(c echo.Context) error {
 //	@Tags			Waypoint
 //	@Accept			json
 //	@Produce		json
-//	@Param			id	path		int							true	"Waypoint ID"
-//	@Success		200	{object}	responses.WaypointResponse	"Success"
-//	@Failure		404	{object}	responses.ErrorResponse		"Waypoint Not Found"
-//	@Failure		500	{object}	responses.ErrorResponse		"Internal Error Querying Waypoint"
+//	@Param			id	path		int											true	"Waypoint ID"
+//	@Success		200	{object}	responses.SingleResponse[models.Waypoint]	"Success"
+//	@Failure		404	{object}	responses.ErrorResponse						"Waypoint Not Found"
+//	@Failure		500	{object}	responses.ErrorResponse						"Internal Error Querying Waypoint"
 //	@Router			/waypoint/{id} [get]
 func GetWaypoint(c echo.Context) error {
 	waypointId := c.Param("waypointId")
@@ -229,9 +229,9 @@ func GetWaypoint(c echo.Context) error {
 			Message: "Error whilst querying waypoint!"})
 	}
 
-	return c.JSON(http.StatusOK, responses.WaypointResponse{
+	return c.JSON(http.StatusOK, responses.SingleResponse[models.Waypoint]{
 		Message:  "Waypoint found!",
-		Waypoint: waypoint,
+		Model: waypoint,
 	})
 }
 
@@ -242,10 +242,10 @@ func GetWaypoint(c echo.Context) error {
 //	@Tags			Waypoint
 //	@Accept			json
 //	@Produce		json
-//	@Param			id	path		int							true	"Waypoint ID"
-//	@Success		200	{object}	responses.WaypointResponse	"Success (returns a blank Waypoint)"
-//	@Failure		404	{object}	responses.ErrorResponse		"Waypoint Not Found"
-//	@Failure		500	{object}	responses.ErrorResponse		"Internal Error Deleting Waypoint"
+//	@Param			id	path		int											true	"Waypoint ID"
+//	@Success		200	{object}	responses.SingleResponse[models.Waypoint]	"Success (returns a blank Waypoint)"
+//	@Failure		404	{object}	responses.ErrorResponse						"Waypoint Not Found"
+//	@Failure		500	{object}	responses.ErrorResponse						"Internal Error Deleting Waypoint"
 //	@Router			/waypoint/{id} [delete]
 func DeleteWaypoint(c echo.Context) error {
 	db, _ := c.Get("db").(*gorm.DB)
@@ -266,9 +266,9 @@ func DeleteWaypoint(c echo.Context) error {
 			Message: "No requested waypoint exists!"})
 	}
 
-	return c.JSON(http.StatusOK, responses.WaypointResponse{
+	return c.JSON(http.StatusOK, responses.SingleResponse[models.Waypoint]{
 		Message:  "Waypoint deleted!",
-		Waypoint: models.Waypoint{},
+		Model: models.Waypoint{},
 	})
 }
 
@@ -279,11 +279,11 @@ func DeleteWaypoint(c echo.Context) error {
 //	@Tags			Waypoint
 //	@Accept			json
 //	@Produce		json
-//	@Param			ids	body		[]int						true	"Waypoint IDs"
-//	@Success		200	{object}	responses.WaypointResponse	"Success (returns a blank Waypoint)"
-//	@Failure		400	{object}	responses.ErrorResponse		"Invalid JSON or Waypoint IDs"
-//	@Failure		404	{object}	responses.ErrorResponse		"Waypoints Not Found"
-//	@Failure		500	{object}	responses.ErrorResponse		"Internal Error Deleting Waypoint"
+//	@Param			ids	body		[]int										true	"Waypoint IDs"
+//	@Success		200	{object}	responses.SingleResponse[models.Waypoint]	"Success (returns a blank Waypoint)"
+//	@Failure		400	{object}	responses.ErrorResponse						"Invalid JSON or Waypoint IDs"
+//	@Failure		404	{object}	responses.ErrorResponse						"Waypoints Not Found"
+//	@Failure		500	{object}	responses.ErrorResponse						"Internal Error Deleting Waypoint"
 //	@Router			/waypoints [delete]
 func DeleteWaypointBatch(c echo.Context) error {
 	db, _ := c.Get("db").(*gorm.DB)
@@ -328,9 +328,9 @@ func DeleteWaypointBatch(c echo.Context) error {
 		}
 	}
 
-	return c.JSON(http.StatusOK, responses.WaypointResponse{
+	return c.JSON(http.StatusOK, responses.SingleResponse[models.Waypoint]{
 		Message:  "Waypoints deleted!",
-		Waypoint: models.Waypoint{},
+		Model: models.Waypoint{},
 	})
 }
 
@@ -341,8 +341,8 @@ func DeleteWaypointBatch(c echo.Context) error {
 //	@Tags			Waypoint
 //	@Accept			json
 //	@Produce		json
-//	@Success		200	{object}	responses.WaypointsResponse	"Success"
-//	@Failure		500	{object}	responses.ErrorResponse		"Internal Error Querying Waypoints"
+//	@Success		200	{object}	responses.MultipleResponse[models.Waypoint]	"Success"
+//	@Failure		500	{object}	responses.ErrorResponse						"Internal Error Querying Waypoints"
 //	@Router			/waypoints [get]
 func GetAllWaypoints(c echo.Context) error {
 	var waypoints []models.Waypoint
@@ -359,8 +359,8 @@ func GetAllWaypoints(c echo.Context) error {
 			Data:    err.Error()})
 	}
 
-	return c.JSON(http.StatusOK, responses.WaypointsResponse{
+	return c.JSON(http.StatusOK, responses.MultipleResponse[models.Waypoint]{
 		Message:   "Waypoint found!",
-		Waypoints: waypoints,
+		Models: waypoints,
 	})
 }

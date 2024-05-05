@@ -35,6 +35,7 @@ func main() {
 	}
 
 	e := echo.New()
+	e.Use(middleware.CORS())
 
 	e.Use(util.DBMiddleware(db))
 	e.Use(util.MPMiddleware(mp))
@@ -70,6 +71,16 @@ func main() {
 	e.GET("/drone/queue", controllers.GetQueue)
 	e.POST("/drone/queue", controllers.PostQueue)
 	e.POST("/drone/home", controllers.PostHome)
+	e.POST("/drone/arm", controllers.Arm)
+
+	//Ground Objects
+	e.POST("/groundobject", controllers.CreateGroundObject)
+	e.POST("/groundobjects", controllers.CreateGroundObjectBatch)
+	e.PATCH("/groundobject/:objectId", controllers.EditGroundObject)
+	e.GET("/groundobject/:objectId", controllers.GetGroundObject)
+	e.DELETE("/groundobject/:objectId", controllers.DeleteGroundObject)
+	e.DELETE("/groundobjects", controllers.DeleteGroundObjectBatch)
+	e.GET("/groundobjects", controllers.GetAllGroundObjects)
 
 	//Websockets
 	e.Any("/socket.io/", controllers.WebsocketHandler())

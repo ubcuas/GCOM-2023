@@ -8,13 +8,14 @@ import (
 	"gcom-backend/controllers"
 	"gcom-backend/models"
 	"gcom-backend/responses"
-	"github.com/stretchr/testify/require"
-	"gorm.io/gorm"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"strconv"
 	"testing"
+
+	"github.com/stretchr/testify/require"
+	"gorm.io/gorm"
 
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
@@ -102,10 +103,10 @@ func (s *WaypointTestSuite) TestCreateWaypointA() {
 	require.NoError(s.T(), controllers.CreateWaypoint(c)) //require stops execution of the test if it fails
 	assert.Equal(s.T(), http.StatusOK, rec.Code)          //assert does not stop execution of the test if it fails
 
-	var response responses.WaypointResponse
+	var response responses.SingleResponse[models.Waypoint]
 	require.NoError(s.T(), json.Unmarshal(rec.Body.Bytes(), &response))
 
-	assert.Equal(s.T(), expectedWp, response.Waypoint)
+	assert.Equal(s.T(), expectedWp, response.Model)
 
 }
 
@@ -160,9 +161,9 @@ func (s *WaypointTestSuite) TestEditWaypoint() {
 
 	require.NoError(s.T(), controllers.CreateWaypoint(createC))
 
-	var createResp responses.WaypointResponse
+	var createResp responses.SingleResponse[models.Waypoint]
 	require.NoError(s.T(), json.Unmarshal(createRec.Body.Bytes(), &createResp))
-	expectedWp.ID = createResp.Waypoint.ID
+	expectedWp.ID = createResp.Model.ID
 
 	//In order to add parameters, we must specify them this way
 	c, rec := JSONContextBuilder(s, http.MethodPatch, "/waypoint", []byte(editJSON))
@@ -172,10 +173,10 @@ func (s *WaypointTestSuite) TestEditWaypoint() {
 	require.NoError(s.T(), controllers.EditWaypoint(c))
 	assert.Equal(s.T(), http.StatusOK, rec.Code)
 
-	var response responses.WaypointResponse
+	var response responses.SingleResponse[models.Waypoint]
 	require.NoError(s.T(), json.Unmarshal(rec.Body.Bytes(), &response))
 
-	assert.Equal(s.T(), expectedWp, response.Waypoint)
+	assert.Equal(s.T(), expectedWp, response.Model)
 }
 
 func (s *WaypointTestSuite) TestEditNonExistentWaypoint() {
@@ -220,21 +221,21 @@ func (s *WaypointTestSuite) TestQueryWaypoint() {
 
 	require.NoError(s.T(), controllers.CreateWaypoint(createC))
 
-	var createResp responses.WaypointResponse
+	var createResp responses.SingleResponse[models.Waypoint]
 	require.NoError(s.T(), json.Unmarshal(createRec.Body.Bytes(), &createResp))
-	expectedWp.ID = createResp.Waypoint.ID
+	expectedWp.ID = createResp.Model.ID
 
 	c, rec := BlankContextBuilder(s, http.MethodGet, "/waypoint")
 	c.SetPath("/waypoint/:waypointId")
 	c.SetParamNames("waypointId")
 	c.SetParamValues(strconv.Itoa(expectedWp.ID))
 
-	var response responses.WaypointResponse
+	var response responses.SingleResponse[models.Waypoint]
 	require.NoError(s.T(), controllers.GetWaypoint(c))
 	require.NoError(s.T(), json.Unmarshal(rec.Body.Bytes(), &response))
 	assert.Equal(s.T(), http.StatusOK, rec.Code)
 
-	assert.Equal(s.T(), expectedWp, response.Waypoint)
+	assert.Equal(s.T(), expectedWp, response.Model)
 }
 
 func (s *WaypointTestSuite) TestQueryNonExistentWaypoint() {
@@ -269,13 +270,13 @@ func (s *WaypointTestSuite) TestDeleteWaypoint() {
 
 	require.NoError(s.T(), controllers.CreateWaypoint(createC))
 
-	var createResp responses.WaypointResponse
+	var createResp responses.SingleResponse[models.Waypoint]
 	require.NoError(s.T(), json.Unmarshal(createRec.Body.Bytes(), &createResp))
 
 	c, rec := BlankContextBuilder(s, http.MethodDelete, "/waypoint")
 	c.SetPath("/waypoint/:waypointId")
 	c.SetParamNames("waypointId")
-	c.SetParamValues(strconv.Itoa(createResp.Waypoint.ID))
+	c.SetParamValues(strconv.Itoa(createResp.Model.ID))
 
 	require.NoError(s.T(), controllers.GetWaypoint(c))
 	assert.Equal(s.T(), http.StatusOK, rec.Code)
@@ -327,21 +328,21 @@ func (s *WaypointTestSuite) TestQueryAllWaypoints() {
 		createC, createRec := JSONContextBuilder(s, http.MethodPost, "/waypoint", wpBytes)
 		require.NoError(s.T(), controllers.CreateWaypoint(createC))
 
-		var createResp responses.WaypointResponse
+		var createResp responses.SingleResponse[models.Waypoint]
 		require.NoError(s.T(), json.Unmarshal(createRec.Body.Bytes(), &createResp))
 
 		assert.Equal(s.T(), http.StatusOK, createRec.Code)
-		expectedWps = append(expectedWps, createResp.Waypoint)
+		expectedWps = append(expectedWps, createResp.Model)
 	}
 
 	c, rec := BlankContextBuilder(s, http.MethodGet, "/waypoints")
 
-	var response responses.WaypointsResponse
+	var response responses.MultipleResponse[models.Waypoint]
 	require.NoError(s.T(), controllers.GetAllWaypoints(c))
 	require.NoError(s.T(), json.Unmarshal(rec.Body.Bytes(), &response))
 	assert.Equal(s.T(), http.StatusOK, rec.Code)
 
-	assert.Equal(s.T(), expectedWps, response.Waypoints)
+	assert.Equal(s.T(), expectedWps, response.Models)
 
 }
 
