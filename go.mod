@@ -6,10 +6,10 @@ toolchain go1.22.1
 
 require (
 	github.com/go-playground/validator v9.31.0+incompatible
-	github.com/googollee/go-socket.io v1.7.0
 	github.com/labstack/echo/v4 v4.11.2
 	github.com/swaggo/echo-swagger v1.4.1
 	github.com/swaggo/swag v1.16.2
+	github.com/zishang520/socket.io/v2 v2.0.5
 )
 
 require (
@@ -24,9 +24,7 @@ require (
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-task/slim-sprig v0.0.0-20230315185526-52ccab3ef572 // indirect
-	github.com/gofrs/uuid v4.4.0+incompatible // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
-	github.com/gomodule/redigo v2.0.0+incompatible // indirect
 	github.com/google/pprof v0.0.0-20230821062121-407c9e7a662f // indirect
 	github.com/gookit/color v1.5.4 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect
@@ -51,7 +49,6 @@ require (
 	github.com/zishang520/engine.io-go-parser v1.2.3 // indirect
 	github.com/zishang520/engine.io/v2 v2.0.3 // indirect
 	github.com/zishang520/socket.io-go-parser/v2 v2.0.4 // indirect
-	github.com/zishang520/socket.io/v2 v2.0.5 // indirect
 	go.uber.org/mock v0.3.0 // indirect
 	golang.org/x/exp v0.0.0-20230817173708-d852ddb80c63 // indirect
 	golang.org/x/mod v0.13.0 // indirect
