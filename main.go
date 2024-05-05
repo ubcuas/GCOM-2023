@@ -92,7 +92,6 @@ func main() {
 	e.POST("/image", controllers.UploadImage)
 	e.GET("/image/list", controllers.ListImages)
 	e.GET("/image/:filename", controllers.GetImage)
-	e.GET("/image/:filename/details", controllers.GetImageDetails)
 
 	//Websockets
 	e.Any("/socket.io/", controllers.WebsocketHandler())

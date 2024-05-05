@@ -3,7 +3,6 @@ package controllers
 import (
 	"fmt"
 	"gcom-backend/models"
-	"gcom-backend/responses"
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
 	"net/http"
@@ -11,6 +10,8 @@ import (
 	"regexp"
 	"strconv"
 )
+
+var imgDirectory = "./imgs/"
 
 func UploadImage(c echo.Context) error {
 	file, err := c.FormFile("file")
@@ -28,7 +29,7 @@ func UploadImage(c echo.Context) error {
 	if err != nil || !match {
 		return c.JSON(http.StatusBadRequest, "Invalid image name, use UNIX timestamp")
 	}
-	dst, err := os.Create("imgs/" + file.Filename)
+	dst, err := os.Create(imgDirectory + file.Filename)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, "Error saving image")
 	}
@@ -54,18 +55,18 @@ func ListImages(c echo.Context) error {
 	var images []models.Image
 	db, _ := c.Get("db").(*gorm.DB)
 	if err := db.Find(&images).Error; err != nil {
-		return c.JSON(http.StatusInternalServerError, responses.ErrorResponse{
-			Message: "Error whilst querying waypoints!",
-			Data:    err.Error()})
+		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
 	return c.JSON(http.StatusOK, images)
 }
 
 func GetImage(c echo.Context) error {
-	return nil
-}
-
-func GetImageDetails(c echo.Context) error {
-	return nil
+	imgPath, err := os.Stat(imgDirectory + c.Param("filename"))
+	fmt.Println(imgPath.Name())
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	} else {
+		return c.Attachment(imgDirectory+c.Param("filename"), c.Param("filename"))
+	}
 }
