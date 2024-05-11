@@ -74,8 +74,8 @@ func CreateWaypoint(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, responses.SingleResponse[models.Waypoint]{
-		Message:  "Waypoint created!",
-		Model: waypoint})
+		Message: "Waypoint created!",
+		Model:   waypoint})
 }
 
 // CreateWaypointBatch creates multiple waypoints
@@ -121,8 +121,8 @@ func CreateWaypointBatch(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, responses.MultipleResponse[models.Waypoint]{
-		Message:   "Waypoints created!",
-		Models: waypoints})
+		Message: "Waypoints created!",
+		Models:  waypoints})
 }
 
 // EditWaypoint edits a waypoint
@@ -199,8 +199,8 @@ func EditWaypoint(c echo.Context) error {
 	db.First(&updatedWaypoint, waypointId)
 
 	return c.JSON(http.StatusOK, responses.SingleResponse[models.Waypoint]{
-		Message:  "Waypoint updated!",
-		Model: updatedWaypoint,
+		Message: "Waypoint updated!",
+		Model:   updatedWaypoint,
 	})
 }
 
@@ -230,8 +230,8 @@ func GetWaypoint(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, responses.SingleResponse[models.Waypoint]{
-		Message:  "Waypoint found!",
-		Model: waypoint,
+		Message: "Waypoint found!",
+		Model:   waypoint,
 	})
 }
 
@@ -267,8 +267,8 @@ func DeleteWaypoint(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, responses.SingleResponse[models.Waypoint]{
-		Message:  "Waypoint deleted!",
-		Model: models.Waypoint{},
+		Message: "Waypoint deleted!",
+		Model:   models.Waypoint{},
 	})
 }
 
@@ -329,8 +329,8 @@ func DeleteWaypointBatch(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, responses.SingleResponse[models.Waypoint]{
-		Message:  "Waypoints deleted!",
-		Model: models.Waypoint{},
+		Message: "Waypoints deleted!",
+		Model:   models.Waypoint{},
 	})
 }
 
@@ -360,7 +360,7 @@ func GetAllWaypoints(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, responses.MultipleResponse[models.Waypoint]{
-		Message:   "Waypoint found!",
-		Models: waypoints,
+		Message: "Images found!",
+		Models:  waypoints,
 	})
 }
