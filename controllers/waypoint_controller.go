@@ -360,7 +360,7 @@ func GetAllWaypoints(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, responses.MultipleResponse[models.Waypoint]{
-		Message: "Images found!",
+		Message: "Waypoints found!",
 		Models:  waypoints,
 	})
 }

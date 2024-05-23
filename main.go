@@ -43,7 +43,6 @@ func main() {
 	}
 
 	e := echo.New()
-	e.Use(middleware.CORS())
 
 	e.Use(util.DBMiddleware(db))
 	e.Use(util.MPMiddleware(mp))
@@ -97,6 +96,10 @@ func main() {
 
 	//Websockets
 	e.Any("/socket.io/", controllers.WebsocketHandler())
+
+	//Mission
+	e.GET("/aeac/load_wp/task1", controllers.LoadAEACTask1Waypoints)
+	e.GET("/aeac/load_wp/task2", controllers.LoadAEACTask2Waypoints)
 
 	e.Logger.Fatal(e.Start("0.0.0.0:1323"))
 }
