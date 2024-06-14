@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -13,6 +14,11 @@ import (
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
 )
+
+type Location struct {
+	Lat float64 `json:"lat"`
+	Lon float64 `json:"lon"`
+}
 
 // CreateGroundObject creates a ground object
 //
@@ -57,6 +63,134 @@ func CreateGroundObject(c echo.Context) error {
 	return c.JSON(http.StatusOK, responses.SingleResponse[models.GroundObject]{
 		Message: "GroundObject created!",
 		Model:   object})
+}
+
+// getDubinsAndNotifyPayload creates new payload path and notifies drone
+//
+//	@Summary
+//	@Description
+//	@Tags
+//	@Accept			json
+//	@Produce		json
+//	@Param			object	body		models.GroundObject								true	"Ground Object Data"
+//	@Success		200		{object}	responses.SingleResponse[models.GroundObject]	"Success"
+//	@Failure		400		{object}	responses.ErrorResponse							"Invalid JSON or Object Data"
+//	@Failure		500		{object}	responses.ErrorResponse							"Internal Error Creating GroundObject"
+//	@Router			/odlc-found [post]
+func GetDubinsAndNotifyPayload(c echo.Context) error {
+
+	db, _ := c.Get("db").(*gorm.DB)
+
+	// Create a new instance of Location
+	loc := new(Location)
+
+	// Bind the request body to loc
+	if err := c.Bind(loc); err != nil {
+		return c.JSON(http.StatusBadRequest, responses.ErrorResponse{
+			Message: "Invalid JSON format",
+			Data:    err.Error()})
+	}
+
+	// Create an instance of the Drone struct
+	var drone models.Drone
+
+	// Unmarshal the JSON data into the Drone struct
+	// err := json.Unmarshal(jsonDataByte, &drone)
+	// if err != nil {
+	// 	fmt.Println("Error:", err)
+	// 	return c.JSON(http.StatusBadRequest, responses.ErrorResponse{
+	// 		Message: "Invalid JSON format",
+	// 		Data:    err.Error()})
+
+	// }
+
+	// db, _ := c.Get("db").(*gorm.DB)\
+	db.Order("timestamp desc").First(&drone)
+	// waypoints := []models.Waypoint{}
+	/*
+		If we use .Find() on an model array, it results all the models in the
+		DB. echo.Map{} does the work of parsing the model array in to JSON for
+		us here, as it has done with a single model before.
+	*/
+	// if err := db.Find(&waypoints).Error; err != nil {
+	// 	return c.JSON(http.StatusInternalServerError, responses.ErrorResponse{
+	// 		Message: "Error whilst querying waypoints!",
+	// 		Data:    err.Error()})
+	// }
+	// nextWaypoint := models.Waypoint{
+	// 	ID:        0,
+	// 	Name:      "Test",
+	// 	Latitude:  drone.Latitude,
+	// 	Longitude: drone.Longitude,
+	// 	Altitude:  drone.Altitude,
+	// }
+	// if len(waypoints) != 0 {
+	// 	nextWaypoint = waypoints[0]
+	// }
+
+	// Sample JSON data (can be replaced with GetCurrentStatus() result)
+	// jsonData := controllers.getCurrentStatus()
+
+	payload := map[string]interface{}{
+		"current_waypoint": map[string]interface{}{
+			"id":        -1,
+			"name":      "",
+			"latitude":  drone.Latitude,
+			"longitude": drone.Longitude,
+			"altitude":  drone.Altitude,
+		},
+		"desired_waypoint": map[string]interface{}{
+			"id":        -1,
+			"name":      "",
+			"latitude":  loc.Lat,
+			"longitude": loc.Lon,
+			"altitude":  25,
+		},
+		"current_heading": drone.Heading,
+		"desired_heading": drone.Heading,
+	}
+
+	// Convert payload to JSON
+	jsonPayload, err := json.Marshal(payload)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return c.JSON(http.StatusBadRequest, responses.ErrorResponse{
+			Message: "Invalid JSON format",
+			Data:    err.Error()})
+	}
+
+	// Send POST request to localhost:7001
+	postResp, err := http.Post("http://localhost:7010", "application/json", bytes.NewBuffer(jsonPayload))
+	if err != nil {
+		fmt.Println("Error sending POST request:", err)
+		return c.JSON(http.StatusBadRequest, responses.ErrorResponse{
+			Message: "Invalid JSON format",
+			Data:    err.Error()})
+	}
+	defer postResp.Body.Close()
+
+	// Read the response body
+	postBody, err := io.ReadAll(postResp.Body)
+	if err != nil {
+		fmt.Println("Error reading POST response body:", err)
+		return c.JSON(http.StatusBadRequest, responses.ErrorResponse{
+			Message: "Invalid JSON format",
+			Data:    err.Error()})
+	}
+	fmt.Println("POST Response:", string(postBody))
+
+	// TODO: send payload to drone
+
+	url := "http://192.168.1.102:9000/insert"
+	jsonBody := bytes.NewBuffer(postBody)
+	resp2, err := http.Post(url, "application/json", jsonBody)
+
+	if err != nil {
+		fmt.Println("Error sending POST request:", err)
+	}
+	print("MPS Response: ", resp2)
+
+	return c.JSON(http.StatusOK, "worked!!!!")
 }
 
 // CreateGroundObjectBatch creates multiple ground objects

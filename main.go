@@ -48,9 +48,9 @@ func main() {
 	e.Use(util.DBMiddleware(db))
 	e.Use(util.MPMiddleware(mp))
 	e.Use(middleware.CORS())
-	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
-		Format: "${time_rfc3339} method=${method} uri=${uri} status=${status} ping=${latency_human}\n",
-	}))
+	// e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
+	// 	Format: "${time_rfc3339} method=${method} uri=${uri} status=${status} ping=${latency_human}\n",
+	// }))
 
 	e.GET("/", func(c echo.Context) error {
 		return c.JSON(200, "Hello, World!")
@@ -98,5 +98,7 @@ func main() {
 	//Websockets
 	e.Any("/socket.io/", controllers.WebsocketHandler())
 
-	e.Logger.Fatal(e.Start("0.0.0.0:1323"))
+	e.POST("/odlc-found", controllers.GetDubinsAndNotifyPayload)
+
+	e.Start("0.0.0.0:1323")
 }

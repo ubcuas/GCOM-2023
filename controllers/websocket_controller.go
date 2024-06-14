@@ -4,11 +4,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"gcom-backend/models"
+	"time"
+
 	"github.com/labstack/echo/v4"
 	"github.com/zishang520/socket.io/v2/socket"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
-	"time"
 )
 
 func WebsocketHandler() func(context echo.Context) error {
@@ -42,7 +43,7 @@ func WebsocketHandler() func(context echo.Context) error {
 			if err := json.Unmarshal(jsonString, &drone); err != nil {
 				client.Emit("error", err.Error())
 			} else {
-				fmt.Println(drone)
+				// fmt.Println(drone)
 				//Add drone
 				db.Save(&drone)
 				//Delete drones older than 5 minutes

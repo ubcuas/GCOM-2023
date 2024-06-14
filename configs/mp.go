@@ -188,6 +188,30 @@ func (mp MissionPlanner) SetQueue(waypoints []models.Waypoint) bool {
 	return resp.StatusCode == http.StatusOK
 }
 
+func (mp MissionPlanner) PrependQueue(waypoints []models.Waypoint) bool {
+	var mpArr []mpWaypoint
+	for _, wp := range waypoints {
+		mpwp := mpWaypoint{
+			ID:        strconv.Itoa(wp.ID),
+			Name:      wp.Name,
+			Longitude: wp.Longitude,
+			Latitude:  wp.Latitude,
+			Altitude:  wp.Altitude,
+		}
+
+		mpArr = append(mpArr, mpwp)
+	}
+
+	json, err := json.Marshal(mpArr)
+
+	if err != nil {
+		log.Fatal("[MP Functions] Error marshalling waypoint queue")
+	}
+	resp := genericPost("http://localhost:9000/insert", json)
+
+	return resp.StatusCode == http.StatusOK
+}
+
 func (mp MissionPlanner) Takeoff(alt float64) bool {
 	json, err := json.Marshal(map[string]float64{
 		"altitude": alt,
