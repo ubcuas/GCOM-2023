@@ -8,6 +8,7 @@ import (
 	"gcom-backend/models"
 	"gcom-backend/responses"
 	"io"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -19,6 +20,7 @@ type Location struct {
 	Latitude  float64 `json:"latitude"`
 	Longitude float64 `json:"longitude"`
 	Altitude  float64 `json:"altitude"`
+	Timestamp int64   `json:"timestamp"`
 }
 
 // CreateGroundObject creates a ground object
@@ -78,6 +80,18 @@ func CreateGroundObject(c echo.Context) error {
 //	@Failure		400		{object}	responses.ErrorResponse							"Invalid JSON or Object Data"
 //	@Failure		500		{object}	responses.ErrorResponse							"Internal Error Creating GroundObject"
 //	@Router			/odlc-found [post]
+func getDroneDataAtTimestamp(db *gorm.DB, timestamp int64) (*models.Drone, error) {
+	var data models.Drone
+	// Use Where() to specify the condition and First() to retrieve the first record that matches the condition
+	result := db.Where("timestamp = ?", timestamp).First(&data)
+	fmt.Printf("RESULT: %+v\n", data)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return &data, nil
+}
+
 func GetDubinsAndNotifyPayload(c echo.Context) error {
 
 	db, _ := c.Get("db").(*gorm.DB)
@@ -99,13 +113,21 @@ func GetDubinsAndNotifyPayload(c echo.Context) error {
 	}
 
 	// Print the latitude, longitude, and altitude
-	fmt.Printf("Latitude: %f, Longitude: %f, Altitude: %f\n", loc.Latitude, loc.Longitude, loc.Altitude)
+	fmt.Printf("Latitude: %f, Longitude: %f, time: %d\n", loc.Latitude, loc.Longitude, loc.Timestamp)
 
-	print("loc")
-	fmt.Printf("Request body: %+v\n", loc)
+	droneData, err := getDroneDataAtTimestamp(db, loc.Timestamp)
+	if err != nil {
+		log.Print(err)
+	} else {
+		fmt.Printf("RETRIEVED DATA: %+v\n", droneData)
+		loc.Latitude = droneData.Latitude
+		loc.Longitude = droneData.Longitude
+	}
+	fmt.Printf("Target Data: %+v\n", loc)
 
 	// Create an instance of the Drone struct
 	var drone models.Drone
+	// use db to get drone data at timestamp
 
 	// Unmarshal the JSON data into the Drone struct
 	// err := json.Unmarshal(jsonDataByte, &drone)
@@ -193,8 +215,8 @@ func GetDubinsAndNotifyPayload(c echo.Context) error {
 	fmt.Println("POST Response:", string(postBody))
 
 	// TODO: send payload to drone
-
-	url := "http://128.189.236.212:9000/insert"
+	// UPDATE THIS
+	url := "http://192.168.1.65:9000/insert"
 	jsonBody := bytes.NewBuffer(postBody)
 	resp2, err := http.Post(url, "application/json", jsonBody)
 
