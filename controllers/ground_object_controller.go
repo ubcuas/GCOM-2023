@@ -16,8 +16,9 @@ import (
 )
 
 type Location struct {
-	Lat float64 `json:"lat"`
-	Lon float64 `json:"lon"`
+	Latitude  float64 `json:"latitude"`
+	Longitude float64 `json:"longitude"`
+	Altitude  float64 `json:"altitude"`
 }
 
 // CreateGroundObject creates a ground object
@@ -83,13 +84,25 @@ func GetDubinsAndNotifyPayload(c echo.Context) error {
 
 	// Create a new instance of Location
 	loc := new(Location)
+	initial_body, err := io.ReadAll(c.Request().Body)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, responses.ErrorResponse{
+			Message: "Error reading request body",
+			Data:    err.Error()})
+	}
+	fmt.Printf("Request body: %s\n", initial_body)
 
-	// Bind the request body to loc
-	if err := c.Bind(loc); err != nil {
+	if err := json.Unmarshal(initial_body, loc); err != nil {
 		return c.JSON(http.StatusBadRequest, responses.ErrorResponse{
 			Message: "Invalid JSON format",
 			Data:    err.Error()})
 	}
+
+	// Print the latitude, longitude, and altitude
+	fmt.Printf("Latitude: %f, Longitude: %f, Altitude: %f\n", loc.Latitude, loc.Longitude, loc.Altitude)
+
+	print("loc")
+	fmt.Printf("Request body: %+v\n", loc)
 
 	// Create an instance of the Drone struct
 	var drone models.Drone
@@ -142,8 +155,8 @@ func GetDubinsAndNotifyPayload(c echo.Context) error {
 		"desired_waypoint": map[string]interface{}{
 			"id":        -1,
 			"name":      "",
-			"latitude":  loc.Lat,
-			"longitude": loc.Lon,
+			"latitude":  loc.Latitude,
+			"longitude": loc.Longitude,
 			"altitude":  25,
 		},
 		"current_heading": drone.Heading,
@@ -181,7 +194,7 @@ func GetDubinsAndNotifyPayload(c echo.Context) error {
 
 	// TODO: send payload to drone
 
-	url := "http://192.168.1.102:9000/insert"
+	url := "http://128.189.236.212:9000/insert"
 	jsonBody := bytes.NewBuffer(postBody)
 	resp2, err := http.Post(url, "application/json", jsonBody)
 
