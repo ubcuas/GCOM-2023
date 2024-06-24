@@ -21,6 +21,7 @@ type Location struct {
 	Longitude float64 `json:"longitude"`
 	Altitude  float64 `json:"altitude"`
 	Timestamp int64   `json:"timestamp"`
+	Icon      string  `json:"icon"`
 }
 
 // CreateGroundObject creates a ground object
@@ -214,9 +215,31 @@ func GetDubinsAndNotifyPayload(c echo.Context) error {
 	}
 	fmt.Println("POST Response:", string(postBody))
 
+	// Initialize the map for icon to bottle IDs
+	iconToBottleID := map[string]int{
+		"blue_pentagon": 1,
+		"white_square":  2,
+		// Add more mappings as needed
+	}
+
 	// TODO: send payload to drone
+	raspURL := "http://10.42.0.1:8000/drop/" + strconv.Itoa(iconToBottleID[loc.Icon])
+	bottleInfo := map[string]interface{}{
+		"latitude":  loc.Latitude,
+		"longitude": loc.Longitude,
+		"heading":   drone.Heading,
+	}
+	bottleInfoJSON, err := json.Marshal(bottleInfo)
+	if err != nil {
+		fmt.Println("Error marshalling bottleInfo to JSON:", err)
+	}
+
+	fmt.Printf("Sending POST request to %s with payload: %s\n", raspURL, bottleInfoJSON)
+
+	http.Post(raspURL, "application/json", bytes.NewBuffer(bottleInfoJSON))
+
 	// UPDATE THIS
-	url := "http://192.168.1.65:9000/insert"
+	url := "http://10.42.0.51:9000/insert"
 	jsonBody := bytes.NewBuffer(postBody)
 	resp2, err := http.Post(url, "application/json", jsonBody)
 
