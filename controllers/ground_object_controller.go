@@ -123,6 +123,7 @@ func GetDubinsAndNotifyPayload(c echo.Context) error {
 		fmt.Printf("RETRIEVED DATA: %+v\n", droneData)
 		loc.Latitude = droneData.Latitude
 		loc.Longitude = droneData.Longitude
+		loc.Altitude = droneData.Altitude
 	}
 	fmt.Printf("Target Data: %+v\n", loc)
 
@@ -186,6 +187,8 @@ func GetDubinsAndNotifyPayload(c echo.Context) error {
 		"desired_heading": drone.Heading,
 	}
 
+	fmt.Printf("PAYLOAD Data: %+v\n", payload)
+
 	// Convert payload to JSON
 	jsonPayload, err := json.Marshal(payload)
 	if err != nil {
@@ -223,7 +226,7 @@ func GetDubinsAndNotifyPayload(c echo.Context) error {
 	}
 
 	// TODO: send payload to drone
-	raspURL := "http://10.42.0.1:8000/drop/" + strconv.Itoa(iconToBottleID[loc.Icon])
+	raspURL := "http://10.42.1.1:8000/drop/" + strconv.Itoa(iconToBottleID[loc.Icon])
 	bottleInfo := map[string]interface{}{
 		"latitude":  loc.Latitude,
 		"longitude": loc.Longitude,
@@ -239,7 +242,9 @@ func GetDubinsAndNotifyPayload(c echo.Context) error {
 	http.Post(raspURL, "application/json", bytes.NewBuffer(bottleInfoJSON))
 
 	// UPDATE THIS
-	url := "http://10.42.0.51:9000/insert"
+	// hostname, err := os.Hostname()
+	// url := "http://" + hostname + ".local:9000/insert"
+	url := "http://192.168.8.191:9000/insert"
 	jsonBody := bytes.NewBuffer(postBody)
 	resp2, err := http.Post(url, "application/json", jsonBody)
 

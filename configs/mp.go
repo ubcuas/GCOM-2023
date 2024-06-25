@@ -207,7 +207,7 @@ func (mp MissionPlanner) PrependQueue(waypoints []models.Waypoint) bool {
 	if err != nil {
 		log.Fatal("[MP Functions] Error marshalling waypoint queue")
 	}
-	resp := genericPost("http://localhost:9000/insert", json)
+	resp := genericPost("http://192.168.8.191:9000/insert", json)
 
 	return resp.StatusCode == http.StatusOK
 }

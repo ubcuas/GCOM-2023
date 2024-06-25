@@ -37,7 +37,7 @@ func main() {
 		return
 	}
 
-	mp, err := configs.ConnectMissionPlanner("http://localhost:9000")
+	mp, err := configs.ConnectMissionPlanner("http://192.168.8.191:9000")
 	if err != nil {
 		log.Fatal("Error connecting to MPS")
 	}

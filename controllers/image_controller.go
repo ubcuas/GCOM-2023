@@ -3,12 +3,12 @@ package controllers
 import (
 	"fmt"
 	"gcom-backend/models"
-	"github.com/labstack/echo/v4"
-	"gorm.io/gorm"
 	"net/http"
 	"os"
-	"regexp"
 	"strconv"
+
+	"github.com/labstack/echo/v4"
+	"gorm.io/gorm"
 )
 
 var imgDirectory = "./imgs/"
@@ -25,18 +25,14 @@ func UploadImage(c echo.Context) error {
 	}
 	defer src.Close()
 
-	match, err := regexp.MatchString("(\\d{10})", file.Filename)
-	if err != nil || !match {
-		return c.JSON(http.StatusBadRequest, "Invalid image name, use UNIX timestamp")
-	}
 	dst, err := os.Create(imgDirectory + file.Filename)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, "Error saving image")
 	}
 	defer dst.Close()
 
-	timestamp, _ := strconv.Atoi(file.Filename[:10])
-	fmt.Println(file.Filename[:13])
+	timestamp, _ := strconv.Atoi(file.Filename[:14])
+	fmt.Println(file.Filename[:14])
 	fmt.Println(timestamp)
 	image := &models.Image{
 		Timestamp: int64(timestamp),
